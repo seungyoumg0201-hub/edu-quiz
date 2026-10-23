@@ -84,6 +84,10 @@ table.fr tr.hl td{background:rgba(250,204,21,.25)}details.frp{margin:10px 0;bord
 .def2{margin:6px 0}
 .exp2{margin-top:14px;padding:14px 16px;border-radius:14px;background:rgba(79,107,237,.08);font-size:14px;line-height:1.75}.exp2 b{display:block;margin-bottom:4px}
 .conf2{margin-top:10px;padding:9px 13px;border-radius:12px;background:var(--bg);font-size:12.5px;color:var(--mut)}
+#fw{position:relative;touch-action:pan-y;overscroll-behavior-x:none}
+.swl{position:absolute;top:14px;z-index:5;padding:6px 14px;border-radius:12px;font-weight:800;font-size:18px;opacity:0;pointer-events:none;border:3px solid;background:var(--card)}
+.swl.ok{left:16px;color:var(--ok);border-color:var(--ok);transform:rotate(-10deg)}.swl.no{right:16px;color:var(--bad);border-color:var(--bad);transform:rotate(10deg)}
+#fw.tok .face{box-shadow:inset 0 0 0 999px rgba(22,163,74,var(--tint,0))}#fw.tno .face{box-shadow:inset 0 0 0 999px rgba(220,38,38,var(--tint,0))}
 </style></head><body>
 <header><div class="hd"><button class="ib" id="backBtn" aria-label="홈으로" hidden>←</button><h1 id="ttl">📘 교육학 <b>논술 암기</b></h1>
 <nav id="nav"><button data-n="home" class="on"><span class="ic">🏠</span>홈</button><button data-n="today"><span class="ic">⚡</span>오늘 복습</button><button data-n="wrong"><span class="ic">📕</span>오답<span class="bd" id="wbd"></span></button><button data-n="card"><span class="ic">🃏</span>카드</button><button data-n="con"><span class="ic">📚</span>개념</button><button data-n="stats"><span class="ic">📊</span>통계</button></nav>
@@ -183,10 +187,16 @@ const LABS=/^(개념|정의|특징|장점|단점|한계|효과|수업 적용|예
 const inl=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
 function rich(a){return a.split('\n').map(l=>{let m=l.match(/^\*\*(.+?)\*\*\s*[—:]\s*(.+)$/);if(m&&!LABS.test(m[1]+': x'))return `<div class="ovr"><b>${esc(m[1])}</b><span>${inl(m[2])}</span></div>`;
  m=l.replace(/\*\*/g,'').match(LABS);if(m)return `<div class="sec2"><span class="lab">${esc(m[1])}</span><div>${inl(l.slice(l.indexOf(':')+1).trim())}</div></div>`;return `<div class="def2">${inl(l)}</div>`}).join('')}
+function swipe(el,done){let sx=0,sy=0,dx=0,on=0,dir=0,id=null;const lab=document.createElement('div');lab.className='swl';el.appendChild(lab);
+ const set=(x,t)=>{el.style.transition=t?'transform .25s ease':'none';el.style.transform=x?`translateX(${x}px) rotate(${x/18}deg)`:'';const a=Math.min(1,Math.abs(x)/90);lab.style.opacity=a;lab.textContent=x>0?'알아요 ✓':'모름 ✕';lab.className='swl '+(x>0?'ok':'no');el.style.setProperty('--tint',a*.3);el.classList.toggle('tok',x>0);el.classList.toggle('tno',x<0)};
+ el.addEventListener('pointerdown',e=>{if(e.button>0||e.target.closest('summary,a,button,details'))return;sx=e.clientX;sy=e.clientY;dx=0;on=1;dir=0;id=e.pointerId});
+ el.addEventListener('pointermove',e=>{if(!on||e.pointerId!==id)return;const x=e.clientX-sx,y=e.clientY-sy;if(!dir){if(Math.abs(x)<8&&Math.abs(y)<8)return;dir=Math.abs(x)>Math.abs(y)*1.2?1:2;if(dir===1)try{el.setPointerCapture(id)}catch(_){}}if(dir!==1)return;e.preventDefault();dx=x;set(dx)});
+ const end=e=>{if(!on||(e&&e.pointerId!==id))return;on=0;if(dir===1){el._sw=1;setTimeout(()=>el._sw=0,350);if(Math.abs(dx)>=90){set(dx>0?innerWidth:-innerWidth,1);setTimeout(()=>done(dx>0),180)}else set(0,1)}};
+ el.addEventListener('pointerup',end);el.addEventListener('pointercancel',e=>{on=0;set(0,1)})}
 function showCard(x){const c=CI[x.c]||{};app.innerHTML=`${head(x)}<div class="flipw" id="fw" style="margin-top:10px"><div class="flipi"><div class="face front cf"><div class="cmeta"><span class="sj">${esc(c.n||'')}</span><span>${esc(x.t||'암기카드')}</span></div><div class="cq">${esc(x.q)}</div><div class="hint">탭하여 정답 보기${matchMedia('(pointer:fine)').matches?' · Space':''}</div></div>
  <div class="face back cb"><div class="cmeta"><span class="sj">${esc(c.n||'')}</span><span>정답</span></div><div class="ca">${rich(x.a)}</div>${x.e?'<div class="exp2"><b>💡 보충</b>'+esc(x.e)+'</div>':''}${x.basis?'<div class="conf2">📊 빈출 근거: '+esc(x.basis)+'</div>':''}</div></div></div><div id="jd"></div>`;
  const fw=$('#fw');const flip=()=>{fw.classList.toggle('fl');if(!$('#jd').innerHTML){$('#jd').innerHTML=cmpTable(x)+framePanel(x,false)+judgeBtns();bindJudge(x.id);setTimeout(()=>{const k=KEY;KEY=e=>{if(e.key===' ')flip();else k&&k(e)}},60)}};
- fw.onclick=flip;KEY=e=>{if(e.key===' '||e.key==='Enter')flip()}}
+ fw.onclick=e=>{if(fw._sw){fw._sw=0;return}flip()};swipe(fw,ok=>{if(!$('#ok'))flip();$(ok?'#ok':'#no').click()});KEY=e=>{if(e.key===' '||e.key==='Enter')flip()}}
 function showShort(x){app.innerHTML=`${head(x)}<div class="card" style="margin-top:10px"><div class="q">${esc(x.q)}</div><input type="text" id="si" ${IA} placeholder="정답 입력 후 Enter"><div class="row"><button class="btn l" id="sh">정답 보기</button><button class="btn" id="ck">채점</button></div><div id="ex"></div></div>`;
  const fin=typed=>{const r=kwHits($('#si').value,x.kw2),h=r.filter(z=>z.hit).length,ok=typed?h===r.length:false;app.querySelector('.row').style.display='none';$('#si').disabled=true;document.activeElement.blur();
   $('#ex').innerHTML=`<div class="ans ${ok?'':'bad'}"><b>${ok?'정답!':typed?'보완 필요':'정답'}</b> ${typed?kwHtml(r)+'<br>':''}${esc(x.a)}${x.e?'<br><span class="meta">'+esc(x.e)+'</span>':''}</div>${framePanel(x,false)}${judgeRow(typed?ok:undefined)}`;bindJudge(x.id,typed?ok:undefined)};
