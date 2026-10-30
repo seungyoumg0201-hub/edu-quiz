@@ -100,6 +100,7 @@ mark.clue{background:#ffe58a;color:#191f28;border-radius:4px;padding:0 2px}b.lab
 .cov{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}.cov span{width:96px;flex:none}.cov i{flex:1;height:10px;background:var(--bd);border-radius:6px;overflow:hidden}.cov i b{display:block;height:100%;background:var(--acc)}.cov em{width:28px;text-align:right;font-style:normal}
 .wk{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--bd);font-size:14px}.wk span{flex:1}.wk em{font-style:normal;color:var(--bad)}.wk .chip{min-height:32px}
 .dt{width:100%;min-height:44px;border:1.5px solid var(--bd);border-radius:12px;padding:0 10px;font-size:16px;background:var(--card);color:var(--fg)}
+.achip{min-height:44px;border-radius:12px;background:var(--card);border:1px solid var(--bd);font-size:13px;font-weight:600;padding:0 10px;display:inline-flex;align-items:center;gap:6px;color:var(--fg)}.achip .dot{width:8px;height:8px;border-radius:50%;background:var(--bd)}.achip.ok .dot{background:#2e9d5b}.achip.pend .dot{background:#d9a13a}.achip.err .dot{background:var(--bad)}.achip .av{width:22px;height:22px;border-radius:50%;background:var(--acc);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px}@media(max-width:420px){.achip .tx{display:none}}
 </style></head><body>
 <header><div class="hd"><button class="ib" id="backBtn" aria-label="홈으로" hidden>←</button><h1 id="ttl">📘 교육학 <b>논술 암기</b></h1>
 <nav id="nav"><button data-n="home" class="on"><span class="ic">🏠</span>홈</button><button data-n="today"><span class="ic">⚡</span>오늘 복습</button><button data-n="wrong"><span class="ic">📕</span>오답<span class="bd" id="wbd"></span></button><button data-n="card"><span class="ic">🃏</span>카드</button><button data-n="con"><span class="ic">📚</span>개념</button><button data-n="stats"><span class="ic">📊</span>통계</button></nav>
@@ -108,7 +109,7 @@ mark.clue{background:#ffe58a;color:#191f28;border-radius:4px;padding:0 2px}b.lab
 <script>
 const DATA=/*__DATA__*/;
 const LS='edu_quiz_v1';let st=JSON.parse(localStorage.getItem(LS)||'{}');st.sr=st.sr||{};st.wr=st.wr||{};st.hist=st.hist||{};st.days=st.days||{};
-const save=()=>localStorage.setItem(LS,JSON.stringify(st));
+const save=()=>{localStorage.setItem(LS,JSON.stringify(st));try{window.cloudDirty&&cloudDirty()}catch(e){}};
 const $=s=>document.querySelector(s),app=$('#app');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -119,7 +120,7 @@ function toast(m){const e=document.createElement('div');e.className='toast';e.te
 const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 st.hint=st.hint||{};const HU=new Set();
 function grade(id,ok){const r=st.sr[id]||{b:0,d:0};const hu=ok&&HU.has(id);if(hu){r.b=1;r.d=Date.now()+DAY;toast('💡 힌트 사용 → 약한 정답(1일 후 재복습)')}else{r.b=ok?Math.min(r.b+1,5):0;r.d=Date.now()+(ok?IV[r.b]*DAY:10*60e3)}st.sr[id]=r;
- const h=st.hist[id]||{c:0,w:0};ok?h.c++:h.w++;if(hu)h.hc=(h.hc||0)+1;st.hist[id]=h;if(!ok)st.wr[id]=(st.wr[id]||0)+1;else if(!hu&&st.wr[id]&&r.b>=2)delete st.wr[id];
+ const h=st.hist[id]||{c:0,w:0};ok?h.c++:h.w++;if(hu)h.hc=(h.hc||0)+1;st.hist[id]=h;if(!ok){st.wr[id]=(st.wr[id]||0)+1;try{window.eduMiss&&eduMiss(id)}catch(e){}}else if(!hu&&st.wr[id]&&r.b>=2){delete st.wr[id];(st.wrDel=st.wrDel||{})[id]=Date.now()}
  const k=dk();st.days[k]=(st.days[k]||0)+1;if(st.days[k]===GOAL)setTimeout(()=>toast('🎉 오늘 목표 '+GOAL+'문항 달성!'),300);save();buzz(ok?15:[30,40,30]);sess[ok?'c':'w']++;badge()}
 const CON=DATA.con,CI=Object.fromEntries(CON.map(c=>[c.id,c]));
 {const ids=new Set(DATA.items.map(x=>x.id));let ch=0;for(const k in st.wr)if(!ids.has(k)){delete st.wr[k];ch=1}if(ch)save()}
@@ -169,9 +170,9 @@ function conOne(id){VIEW='conOne';const c=CI[id];F.c=id;setNav('con');$('#backBt
  <div class="card"><button class="btn" id="cAll">이 개념 전체 학습 (${its.length}문항)</button>${['card','prob','kwr','case','essay','struct','cloze','mcq','short'].filter(by).map(k=>`<button class="btn l" data-k="${k}">${MODES[k][0]} ${MODES[k][1]} ${by(k)}</button>`).join('')}</div>`;
  $('#cAll').onclick=()=>start('all');app.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>start(b.dataset.k))}
 function statsView(){_stats();v13Stats()}function _stats(){setNav('stats');$('#ttl').innerHTML='📊 <b>학습 통계</b>';
- app.innerHTML=heroCard()+`<div class="card"><h2>영역별 진도</h2>${stats()}</div><div class="card"><h2>설정</h2><button class="btn l" id="exp">학습 기록 백업(복사)</button><button class="btn l" id="imp">백업 붙여넣어 복원</button><button class="btn r" id="reset">학습 기록 초기화</button></div>`;
+ app.innerHTML=heroCard()+`<div class="card"><h2>영역별 진도</h2>${stats()}</div><div class="card" id="cloudCard">${cloudCardHTML()}</div><div class="card"><h2>설정</h2><button class="btn l" id="exp">학습 기록 백업(복사)</button><button class="btn l" id="imp">백업 붙여넣어 복원</button><button class="btn r" id="reset">학습 기록 초기화</button></div>`;
  $('#reset').onclick=()=>{if(confirm('모든 학습 기록을 지울까요?')){st={sr:{},wr:{},hist:{},days:{}};save();badge();statsView()}};
- $('#exp').onclick=async()=>{const t=localStorage.getItem(LS)||'{}';try{await navigator.clipboard.writeText(t);toast('클립보드에 복사됨')}catch(e){prompt('아래 내용을 복사해 두세요',t)}};
+ bindCloudCard();$('#exp').onclick=async()=>{const t=localStorage.getItem(LS)||'{}';try{await navigator.clipboard.writeText(t);toast('클립보드에 복사됨')}catch(e){prompt('아래 내용을 복사해 두세요',t)}};
  $('#imp').onclick=()=>{const t=prompt('백업 내용을 붙여넣으세요');if(!t)return;try{const o=JSON.parse(t);if(!o.sr)throw 0;st=o;st.wr=st.wr||{};st.hist=st.hist||{};st.days=st.days||{};save();badge();toast('복원 완료');statsView()}catch(e){alert('형식이 올바르지 않습니다')}}}
 function stats(){let rows=AREAS.map(a=>{const its=DATA.items.filter(x=>x.d===a);let seen=0,mast=0,c=0,w=0;
   its.forEach(x=>{const r=st.sr[x.id],h=st.hist[x.id];if(h){seen++;c+=h.c;w+=h.w}if(r&&r.b>=3)mast++});
@@ -287,7 +288,7 @@ function grade(id,ok){UNDO.push({s:JSON.stringify(st),qi,sess:{...sess},M});if(U
  else{r.b=Math.min(r.b+2,5);r.d=now+Math.round(IV[r.b]*DAY*1.3)}
  st.sr[id]=r;const h=st.hist[id]||{c:0,w:0};
  if(lv==='n')h.w++;else if(lv==='p')h.p=(h.p||0)+1;else h.c++;if(hu)h.hc=(h.hc||0)+1;st.hist[id]=h;
- if(lv==='n'||lv==='p')st.wr[id]=(st.wr[id]||0)+1;else if(!hu&&st.wr[id]&&r.b>=2)delete st.wr[id];
+ if(lv==='n'||lv==='p'){st.wr[id]=(st.wr[id]||0)+1;try{window.eduMiss&&eduMiss(id,lv)}catch(e){}}else if(!hu&&st.wr[id]&&r.b>=2){delete st.wr[id];(st.wrDel=st.wrDel||{})[id]=Date.now()}
  const k=dk();st.days[k]=(st.days[k]||0)+1;if(st.days[k]===GOAL)setTimeout(()=>toast('🎉 오늘 목표 '+GOAL+'문항 달성!'),300);
  const it=II[id];if(it){st.ad[k]=st.ad[k]||{};st.ad[k][it.d]=(st.ad[k][it.d]||0)+1}
  if(lv==='n'||lv==='p'){const ta=$('#ta');if(ta&&ta.value.trim())logAns(id,ta.value.trim(),[...app.querySelectorAll('.kwn b,span.kwn')].map(e=>e.textContent.replace(/^✘\s*/,'')))}
@@ -451,5 +452,51 @@ applyTheme(localStorage.getItem('edu_quiz_theme')||(matchMedia('(prefers-color-s
 $('#theme').onclick=()=>{const t=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('edu_quiz_theme',t);applyTheme(t)};
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{const n=b.dataset.n;n==='home'?home():n==='stats'?statsView():n==='con'?conView():start(n)});
 $('#backBtn').onclick=()=>{if(VIEW==='quiz'&&F.c)conOne(F.c);else if(VIEW==='conOne')conView();else home()};badge();home();
+// ---- 계정 동기화(전공퀴즈 geo-vocab과 같은 Firebase 프로젝트·같은 Google 로그인). 공개 클라이언트 설정만 포함. 앱은 로그인 없이도 전부 동작 ----
+var FBV='10.12.2',FB_CFG={apiKey:'AIzaSyD_1gGwE9fuurmdR3OFKiTy5RfWRGpPIEU',authDomain:'geo-vocab.firebaseapp.com',projectId:'geo-vocab',storageBucket:'geo-vocab.firebasestorage.app',messagingSenderId:'871138215339',appId:'1:871138215339:web:4221ec7bff77e8cae73eee',databaseURL:'https://geo-vocab-default-rtdb.asia-southeast1.firebasedatabase.app'};
+var CL={st:'off',user:null,msg:'',dirty:false,last:+(localStorage.getItem('edu_cloud_last')||0)},fb=null,fbP=null,EDU_NODE='eduquiz';
+function cloudLoad(){if(fbP)return fbP;const u=m=>`https://www.gstatic.com/firebasejs/${FBV}/firebase-${m}.js`;CL.st='loading';
+ fbP=Promise.all(['app','auth','database'].map(m=>import(u(m)))).then(([A,Au,D])=>{const app=A.initializeApp(FB_CFG,'edu');let auth;try{auth=Au.initializeAuth(app,{persistence:[Au.indexedDBLocalPersistence,Au.browserLocalPersistence],popupRedirectResolver:Au.browserPopupRedirectResolver})}catch(e){auth=Au.getAuth(app)}
+  fb={A,Au,D,app,auth,rt:D.getDatabase(app)};CL.st='ready';Au.onAuthStateChanged(auth,u=>{const was=CL.user&&CL.user.uid;CL.user=u||null;localStorage.setItem('edu_fb',u?'1':'0');if(u&&was!==u.uid)onLogin(u);cloudUI()});return fb})
+ .catch(e=>{CL.st='fail';CL.msg=navigator.onLine?'클라우드 기능을 불러오지 못했어요':'오프라인 — 동기화는 온라인에서 돼요';fbP=null;cloudUI();throw e});return fbP}
+function eduRef(){return fb.D.ref(fb.rt,'review/'+CL.user.uid+'/devices/'+EDU_NODE)}
+// 병합: 로컬 기록을 절대 버리지 않음. 오답은 합집합(마지막 오답 시각 > 해제 시각이면 유지), 횟수·통계는 큰 값
+function mergeSt(c){if(!c||typeof c!=='object')return;const mx=(a,b)=>Math.max(a||0,b||0);st.wrAt=st.wrAt||{};st.wrDel=st.wrDel||{};
+ const ca=c.wrAt||{},cd=c.wrDel||{};for(const k in ca)st.wrAt[k]=mx(st.wrAt[k],ca[k]);for(const k in cd)st.wrDel[k]=mx(st.wrDel[k],cd[k]);
+ const ids=new Set(DATA.items.map(x=>x.id)),all=new Set([...Object.keys(st.wr),...Object.keys(c.wr||{})]);
+ for(const k of all){if(!ids.has(k))continue;const n=mx(st.wr[k],(c.wr||{})[k]);if((st.wrAt[k]||1)>(st.wrDel[k]||0))st.wr[k]=n;else delete st.wr[k]}
+ for(const k in (c.sr||{})){const a=st.sr[k],b=c.sr[k];if(!a||(b&&b.d>a.d))st.sr[k]=b}
+ for(const k in (c.hist||{})){const a=st.hist[k]||{c:0,w:0},b=c.hist[k]||{};const h={c:mx(a.c,b.c),w:mx(a.w,b.w)};if(a.hc||b.hc)h.hc=mx(a.hc,b.hc);if(a.p||b.p)h.p=mx(a.p,b.p);st.hist[k]=h}
+ for(const k in (c.days||{}))st.days[k]=mx(st.days[k],c.days[k]);
+ for(const k in c)if(!(k in st))st[k]=c[k]}
+async function onLogin(u){CL.msg='동기화 중…';cloudUI();try{const s=await fb.D.get(eduRef());const v=s.val();if(v&&v.p){try{mergeSt(JSON.parse(v.p))}catch(e){}}
+  localStorage.setItem(LS,JSON.stringify(st));await cloudPush(true);await missBackfill();CL.msg='✅ 동기화됨';try{badge();if(VIEW==='home')home()}catch(e){}}
+ catch(e){CL.msg='⚠️ 동기화 실패: '+(e.code||e.message);toast('동기화 실패 ['+(e.code||e.message)+']')}cloudUI()}
+async function cloudPush(force){if(!fb||!CL.user)return;if(!force&&!CL.dirty)return;CL.dirty=false;
+ await fb.D.set(eduRef(),{name:'교육학 퀴즈 앱(edu-quiz)',app:'edu',v:1,p:JSON.stringify(st),wrN:Object.keys(st.wr).length,seen:fb.D.serverTimestamp()});CL.last=Date.now();localStorage.setItem('edu_cloud_last',CL.last);cloudUI()}
+var _cpT=null;window.cloudDirty=()=>{if(!CL.user)return;CL.dirty=true;cloudUI();clearTimeout(_cpT);_cpT=setTimeout(()=>cloudPush().catch(e=>{CL.msg='⚠️ 동기화 실패: '+(e.code||'');cloudUI()}),4000)};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&CL.dirty)cloudPush().catch(()=>{})});
+// 오답 1건 = 실시간 로그(review/<uid>/misses, d:'edu'). 비로그인 시 대기열에 보관 후 로그인 때 업로드
+function missObj(id){const x=DATA.items.find(i=>i.id===id)||{};return {at:Date.now(),d:'edu',id:id,k:String(x.k||''),area:String(x.d||'').slice(0,60),q:String(x.q||'').replace(/<[^>]+>/g,'').slice(0,200),n:st.wr[id]||1}}
+window.eduMiss=(id,lv)=>{st.wrAt=st.wrAt||{};st.wrAt[id]=Date.now();const o=missObj(id);if(lv)o.lv=lv;if(fb&&CL.user){fb.D.push(fb.D.ref(fb.rt,'review/'+CL.user.uid+'/misses'),o).catch(()=>{queueMiss(o)})}else queueMiss(o)};
+function queueMiss(o){const q=JSON.parse(localStorage.getItem('edu_missq')||'[]');q.push(o);while(q.length>2000)q.shift();localStorage.setItem('edu_missq',JSON.stringify(q))}
+async function missBackfill(){const q=JSON.parse(localStorage.getItem('edu_missq')||'[]');const first=!localStorage.getItem('edu_missbf');
+ if(first){const now=Date.now();for(const id in st.wr)if(!q.some(o=>o.id===id)){const o=missObj(id);o.at=(st.wrAt&&st.wrAt[id])||now;o.how='backfill';q.push(o)}}
+ if(!q.length){localStorage.setItem('edu_missbf','1');return}const u={};q.forEach((o,i)=>{u['e'+o.at+'_'+i+'_'+String(o.id).replace(/[.#$\/\[\]]/g,'_')]=o});
+ await fb.D.update(fb.D.ref(fb.rt,'review/'+CL.user.uid+'/misses'),u);localStorage.setItem('edu_missq','[]');localStorage.setItem('edu_missbf','1');toast('오답 '+q.length+'건을 계정에 올렸어요')}
+async function login(){try{await cloudLoad();const {Au}=fb,pv=new Au.GoogleAuthProvider();pv.setCustomParameters({prompt:'select_account'});
+ try{const r=await Au.signInWithPopup(fb.auth,pv);if(r&&r.user)toast('✅ 로그인됨: '+(r.user.email||''))}catch(e){const c=e&&e.code||'';if(/popup-blocked|operation-not-supported|web-storage-unsupported/.test(c)){localStorage.setItem('edu_lpend','1');await Au.signInWithRedirect(fb.auth,pv)}else throw e}}
+ catch(e){const c=(e&&e.code)||String(e);localStorage.removeItem('edu_lpend');toast('로그인 실패 ['+c+']');cloudUI()}}
+async function logout(){if(!fb)return;try{await cloudPush(true)}catch(e){}await fb.Au.signOut(fb.auth);toast('로그아웃 — 이 기기의 기록은 그대로 남아요')}
+function cloudState(){const u=CL.user;if(!u)return ['off',CL.st=='loading'&&localStorage.getItem('edu_fb')=='1'?'연결 중…':'로그인'];if(/실패/.test(CL.msg))return ['err','동기화 실패'];if(CL.dirty||/중/.test(CL.msg))return ['pend','동기화 대기'];return ['ok','동기화됨']}
+function cloudUI(){let c=$('#authchip');if(!c){const t=$('#theme');if(!t)return;t.insertAdjacentHTML('beforebegin','<button id="authchip" class="achip" aria-label="계정 동기화"></button>');c=$('#authchip');c.onclick=()=>{if(!CL.user)login();else{CL.dirty=true;cloudPush(true).then(()=>{CL.msg='✅ 동기화됨';cloudUI();toast('✅ 동기화됨')}).catch(e=>{CL.msg='⚠️ 동기화 실패: '+(e.code||'');cloudUI()})}}}
+ const [s,tx]=cloudState(),u=CL.user;c.className='achip '+s;c.title=u?'로그인됨 — 탭하면 지금 동기화':'탭해서 Google 로그인(전공퀴즈와 같은 계정)';c.innerHTML=(u?`<span class="av">${esc(((u.displayName||u.email||'나')+'').charAt(0))}</span>`:'')+`<span class="dot"></span><span class="tx">${tx}</span>`;
+ const cc=$('#cloudCard');if(cc){cc.innerHTML=cloudCardHTML();bindCloudCard()}}
+function cloudCardHTML(){if(!CL)return '<h2>☁️ 계정 동기화</h2>';const u=CL.user,hm=t=>t?new Date(t).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'—';
+ if(!u)return `<h2>☁️ 계정 동기화</h2><p class="mut" style="font-size:14px">전공퀴즈(지리)와 같은 Google 계정으로 로그인하면 오답·복습 기록이 기기 간에 합쳐지고, 매일 자정 이후 오답 검토에 쓰여요. 이 기기의 기존 기록은 지워지지 않고 계정에 합쳐져요.</p>${CL.st=='fail'?`<p class="mut">${esc(CL.msg)}</p>`:''}<button class="btn l" id="cLogin">Google로 로그인</button>`;
+ return `<h2>☁️ 계정 동기화</h2><p style="font-size:14px">${esc(u.email||'로그인됨')}<br><span class="mut">${esc(CL.msg||'')} · 마지막 동기화 ${hm(CL.last)} · 오답 ${Object.keys(st.wr).length}개</span></p><button class="btn l" id="cSync">지금 동기화</button><button class="btn l" id="cOut">로그아웃</button>`}
+function bindCloudCard(){const a=$('#cLogin'),b=$('#cSync'),o=$('#cOut');if(a)a.onclick=login;if(b)b.onclick=()=>{CL.dirty=true;cloudPush(true).then(()=>{CL.msg='✅ 동기화됨';cloudUI();toast('✅ 동기화됨')}).catch(e=>toast('동기화 실패 ['+(e.code||'')+']'))};if(o)o.onclick=logout}
+cloudUI();if(localStorage.getItem('edu_fb')=='1'||localStorage.getItem('edu_lpend')=='1'||localStorage.getItem('gv_fb')=='1'){cloudLoad().then(()=>{if(localStorage.getItem('edu_lpend')=='1'){localStorage.removeItem('edu_lpend');return fb.Au.getRedirectResult(fb.auth).catch(e=>toast('로그인 실패 ['+(e.code||'')+']'))}}).catch(()=>{})}
+
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script></body></html>
