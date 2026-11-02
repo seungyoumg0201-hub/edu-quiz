@@ -131,7 +131,7 @@ try{const f=JSON.parse(localStorage.getItem('edu_quiz_filter5')||'null');if(f)F=
 const saveF=()=>localStorage.setItem('edu_quiz_filter5',JSON.stringify({d:[...F.d],g:[...F.g],due:F.due,shuffle:F.shuffle,x22:F.x22,cc:F.cc,cord:F.cord,hj:F.hj}));
 const AREAS=[...new Set(DATA.items.map(x=>x.d))],GR=['S','A','B'];
 const is22=x=>x.d==='2022 개정'||x.x22;
-function pool(mode){if(mode==='plan')return planPool();if(mode==='wt'){const w=DATA.items.filter(x=>x.k==='wt'&&(!WTS||x.s===WTS));return shuf(w)}const _pt=mode!=='pat'&&mode!=='wrong'&&!(st.cfg&&st.cfg.patOn);let it=DATA.items.filter(x=>mode==='wrong'?st.wr[x.id]:mode==='today'||mode==='all'?true:x.k===(mode==='cloze'?'struct':mode==='kwr'?'prob':mode));if(_pt)it=it.filter(x=>x.k!=='pat');
+function pool(mode){if(mode==='plan')return planPool();if(mode==='wday')return wdPool();if(mode==='wweek')return wkPool();if(mode==='wt'){const w=DATA.items.filter(x=>x.k==='wt'&&(!WTS||x.s===WTS));return shuf(w)}const _pt=mode!=='pat'&&mode!=='wrong'&&!(st.cfg&&st.cfg.patOn);let it=DATA.items.filter(x=>mode==='wrong'?st.wr[x.id]:mode==='today'||mode==='all'?true:x.k===(mode==='cloze'?'struct':mode==='kwr'?'prob':mode));if(_pt)it=it.filter(x=>x.k!=='pat');
  if(F.c)it=it.filter(x=>x.c===F.c);
  else if(mode!=='wrong'){it=it.filter(x=>(!F.d.size||F.d.has(x.d))&&(!F.g.size||F.g.has(x.g)));if(F.x22)it=it.filter(is22);if(F.hj)it=it.filter(x=>x.hj);if(F.cc)it=it.filter(x=>x.c===F.cc)}
  if(mode==='today'){const now=Date.now();return it.filter(x=>st.sr[x.id]&&st.sr[x.id].d<=now).sort((a,b)=>st.sr[a.id].d-st.sr[b.id].d)}
@@ -179,14 +179,14 @@ function stats(){let rows=AREAS.map(a=>{const its=DATA.items.filter(x=>x.d===a);
   const p=Math.round(100*mast/its.length);return `<tr><td><b>${a}</b></td><td>${seen}/${its.length}</td><td>${c+w?Math.round(100*c/(c+w))+'%':'-'}</td><td style="width:32%"><div class="bar"><i style="width:${p}%"></i></div><span class="meta">${p}%</span></td></tr>`}).join('');
  return `<table><tr><th>영역</th><th>학습</th><th>정답률</th><th>숙달</th></tr>${rows}</table><div class="prog">오답노트 ${Object.keys(st.wr).length}문항</div>`}
 let VIEW='home';let Q=[],qi=0,M='',sess={c:0,w:0},KEY=null;
-const TT={today:['⚡','오늘 복습'],all:['📚','개념 학습'],plan:['🗓️','오늘의 플랜']};
+const TT={today:['⚡','오늘 복습'],all:['📚','개념 학습'],plan:['🗓️','오늘의 플랜'],wday:['📅','요일 영역'],wweek:['🧹','이번 주 오답 정리']};
 function start(m){M=m;Q=pool(m);qi=0;sess={c:0,w:0};if(!Q.length){toast(m==='today'?'지금 복습할 문항이 없어요 👍':m==='wrong'?'오답노트가 비어 있어요 👍':'해당 조건의 문항이 없습니다');return}
  setNav(m==='today'||m==='wrong'||m==='card'?m:'');const t=MODES[m]||TT[m];$('#ttl').innerHTML=t[0]+' <b>'+t[1]+'</b>';show()}
 function head(x){const p=Math.round(100*qi/Q.length),c=CI[x.c];return `<div class="sbar"><div class="bar"><i style="width:${p}%"></i></div><span>${qi+1} / ${Q.length}</span></div><div class="meta"><span class="tag ${x.g}">${x.g==='S'?'S 최우선':x.g}</span><span class="tag">${esc(x.d)}</span>${x.k==='prob'||x.k==='disc'?'':`<span class="tag">${esc(c?c.n:'')}</span>`}<span class="tag">${KN[x.k]}${x.t?' · '+esc(x.t):''}</span>${x.hj?'<span class="tag">🎓 홍지완</span>':''}${st.wr[x.id]?'<span class="tag" style="color:var(--bad)">오답 '+st.wr[x.id]+'</span>':''}</div>`}
 function next(){qi++;if(qi>=Q.length){KEY=e=>{if(e.key==='Enter')start(M)};const tot=sess.c+sess.w;
  app.innerHTML=`<div class="card done"><div class="big">${sess.w===0?'🏆':'🎯'}</div><div class="q" style="justify-content:center">한 세트 완료!</div><div class="kpis"><div class="kpi"><b>${tot}</b><span>푼 문항</span></div><div class="kpi"><b style="color:var(--ok)">${sess.c}</b><span>맞음</span></div><div class="kpi"><b style="color:var(--bad)">${sess.w}</b><span>틀림</span></div></div>
  <button class="btn" id="again">다시 하기<kbd>Enter</kbd></button>${Object.keys(st.wr).length?'<button class="btn l" id="gw">오답노트 복습</button>':''}<button class="btn l" id="h">${F.c?'개념으로':'홈'}</button></div>`;$('#again').onclick=()=>start(M);$('#h').onclick=()=>F.c?conOne(F.c):home();if($('#gw'))$('#gw').onclick=()=>start('wrong');return}show()}
-function show(){VIEW='quiz';const x=Q[qi];{const t=(M==='today'||M==='wrong'||M==='all')?null:M==='cloze'?MODES.cloze:MODES[x.k];if(t)$('#ttl').innerHTML=t[0]+' <b>'+t[1]+'</b>'}window.scrollTo(0,0);KEY=null;HU.delete(x.id);(M==='kwr'&&x.k==='prob'?showKwr:M==='cloze'&&x.k==='struct'?showCloze:{case:showCase,essay:showEssay,prob:showProb,disc:showDisc,l22:showFlip,pat:showFlip,mcq:showMcq,struct:showStruct,frame:showFrame,card:showCard,short:showShort,wt:showWt}[x.k])(x);addHint(x);v13After(x)}
+function show(){VIEW='quiz';const x=Q[qi];{const t=(M==='today'||M==='wrong'||M==='all'||M==='wday'||M==='wweek')?null:M==='cloze'?MODES.cloze:MODES[x.k];if(t)$('#ttl').innerHTML=t[0]+' <b>'+t[1]+'</b>'}window.scrollTo(0,0);KEY=null;HU.delete(x.id);(M==='kwr'&&x.k==='prob'?showKwr:M==='cloze'&&x.k==='struct'?showCloze:{case:showCase,essay:showEssay,prob:showProb,disc:showDisc,l22:showFlip,pat:showFlip,mcq:showMcq,struct:showStruct,frame:showFrame,card:showCard,short:showShort,wt:showWt}[x.k])(x);addHint(x);v13After(x)}
 function addHint(x){const H=x.h||[];if(!H.length)return;const m=app.querySelector('.meta');if(!m)return;let i=0;
  m.insertAdjacentHTML('afterend',`<div class="hintw" style="margin-top:8px"><button class="chip" id="hb">💡 힌트 (0/${H.length})</button><div id="hs"></div></div>`);
  $('#hb').onclick=e=>{e.stopPropagation();if(i>=H.length)return;HU.add(x.id);st.hint[x.id]=(st.hint[x.id]||0)+1;save();
@@ -323,22 +323,40 @@ function showDisc(x){const O=shuf([x.a,...x.x]);app.innerHTML=`${head(x)}<div cl
   $('#ex').innerHTML=`<div class="ans ${ok?'':'bad'}"><b>${ok?'정답':'오답'}</b> · ${esc(x.lab)} = <b>${esc(x.a)}</b>${w}<div class="meta">🔎 단서: 노란 표시 문장${x.clue.length?' · 단서어 '+x.clue.map(esc).join(', '):''} (자동 추출)</div></div>${framePanel(x,false)}${judgeRow(ok)}`;bindJudge(x.id,ok);$('#ex').scrollIntoView({behavior:'smooth',block:'nearest'})};
  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>pick(b));KEY=e=>{const n=+e.key;if(n>=1&&n<=4){const b=app.querySelectorAll('.opt')[n-1];if(b&&!b.disabled)pick(b)}}}
 /* 2022 연계·문장 패턴 */
-function showFlip(x){app.innerHTML=`${head(x)}<div class="card" style="margin-top:10px"><div class="cq">${esc(x.q)}</div><div class="meta">${x.k==='pat'?'답안 문장의 틀을 떠올린 뒤 확인하세요.':'총론 표현과 이론을 잇는 한 문장을 떠올려 보세요.'}</div><textarea id="ta" rows="3" ${IA} placeholder="떠올린 문장을 적어 보세요(선택)."></textarea><button class="btn" id="rv">확인<kbd>Space</kbd></button><div id="ex"></div></div>`;
- $('#rv').onclick=()=>{$('#rv').style.display='none';$('#ex').innerHTML=`<div class="ans"><b>${x.k==='pat'?'문장 패턴':'연계 문장'}</b><div style="margin-top:6px">${esc(x.a)}</div></div>${x.ex?`<div class="exp2"><b>예시</b><br>${esc(x.ex)}</div>`:''}<div class="meta">📌 ${x.k==='pat'?esc(x.src):'근거(총론 연계): '+esc(x.src)}</div>${x.k==='l22'?framePanel(x,false):''}${judgeRow()}`;bindJudge(x.id);$('#ex').scrollIntoView({behavior:'smooth',block:'nearest'})};
+function showFlip(x){app.innerHTML=`${head(x)}<div class="card" style="margin-top:10px"><div class="cq">${esc(x.q)}</div><div class="meta">${x.tpl?'✍️ 아래 틀의 ___를 직접 채워 쓴 뒤 확인하세요. 조건 표현을 그대로 옮기세요.':x.k==='pat'?'답안 문장의 틀을 떠올린 뒤 확인하세요.':'총론 표현과 이론을 잇는 한 문장을 떠올려 보세요.'}</div><textarea id="ta" rows="${x.tpl?7:3}" ${IA} placeholder="떠올린 문장을 적어 보세요(선택).">${x.tpl?esc(x.tpl):''}</textarea><button class="btn" id="rv">확인<kbd>Space</kbd></button><div id="ex"></div></div>`;
+ $('#rv').onclick=()=>{$('#rv').style.display='none';$('#ex').innerHTML=`<div class="ans"><b>${x.tpl&&x.k==='pat'?'모범 답안':x.k==='pat'?'문장 패턴':'연계 문장'}</b><div style="margin-top:6px">${esc(x.a)}</div></div>${x.ex?`<div class="exp2"><b>${x.tpl&&x.k==='pat'?'채점 포인트':'예시'}</b><br>${esc(x.ex)}</div>`:''}<div class="meta">📌 ${x.k==='pat'?esc(x.src):'근거(총론 연계): '+esc(x.src)}</div>${x.k==='l22'?framePanel(x,false):''}${judgeRow()}`;bindJudge(x.id);$('#ex').scrollIntoView({behavior:'smooth',block:'nearest'})};
  KEY=e=>{if((e.key==='Enter'||e.key===' ')&&document.activeElement.id!=='ta'){e.preventDefault();$('#rv').click()}}}
 /* D-day · 플랜 */
 const PA=[['교육과정'],['교수·공학'],['교육평가'],['교육행정'],['교육심리','상담·사회·철학'],['2022 개정']];
 function dday(){const t=new Date(st.cfg.exam+'T00:00:00'),n=new Date();n.setHours(0,0,0,0);return Math.round((t-n)/DAY)}
-function planArea(){const n=new Date();n.setHours(0,0,0,0);return PA[Math.floor(n/DAY)%PA.length]}
+function planArea(){const w=typeof wdSel==='function'?wdSel():null;if(w)return [WDA[w]];const n=new Date();n.setHours(0,0,0,0);return PA[Math.floor(n/DAY)%PA.length]}
 function planPool(){const D=dday(),now=Date.now(),A=planArea(),KK=['prob','case','disc','essay','struct','mcq','l22','card'];
- let P=DATA.items.filter(x=>KK.includes(x.k));if(D>7)P=P.filter(x=>A.includes(x.d));
+ let P=DATA.items.filter(x=>KK.includes(x.k));if(D>7){const w=wdSel();P=P.filter(x=>w?x.wd===w:A.includes(x.d))}
  const due=P.filter(x=>st.sr[x.id]&&st.sr[x.id].d<=now),wr=D<=7?P.filter(x=>st.wr[x.id]&&!due.includes(x)):[],gs=g=>shuf(P.filter(x=>!st.sr[x.id]&&x.g===g&&['prob','case','disc'].includes(x.k)));
  const out=[];[...shuf(due),...shuf(wr),...gs('S'),...gs('A')].forEach(x=>{if(out.length<30&&!out.includes(x))out.push(x)});return out}
 function v13Home(){const D=dday(),A=planArea(),n=planPool().length,L=st.last&&II[st.last.id]&&(MODES[st.last.m]||TT[st.last.m]);const t=L?(MODES[st.last.m]||TT[st.last.m]):null;
- const h=`<div class="card plan"><div class="pl1"><b class="dd">${D>0?'D-'+D:D===0?'D-DAY':'D+'+(-D)}</b><span class="meta">1차 ${esc(st.cfg.exam)}</span></div><div class="meta">${D<=7?'🔥 최종 점검: 오답·S등급 위주로 전 영역 압축 복습':'오늘의 영역: <b>'+A.join('·')+'</b> (6개 영역 순환)'}</div><button class="btn" id="goPlan">🗓️ 오늘의 플랜 ${n}문항</button>${L?`<button class="btn l" id="goRes">▶ 이어서 하기 · ${t[0]} ${esc(t[1])}</button>`:''}<div class="row"><button class="btn l" id="goSet">📝 실전 논술 세트</button><button class="btn l" id="goDisc">🔎 사례→개념</button></div></div>`;
+ const h=`<div class="card plan"><div class="pl1"><b class="dd">${D>0?'D-'+D:D===0?'D-DAY':'D+'+(-D)}</b><span class="meta">1차 ${esc(st.cfg.exam)}</span></div><div class="meta">${D<=7?'🔥 최종 점검: 오답·S등급 위주로 전 영역 압축 복습':'오늘의 영역: <b>'+A.join('·')+'</b> '+(wdSel()?'(요일 영역 루틴)':'(주말: 6개 영역 순환)')}</div><button class="btn" id="goPlan">🗓️ 오늘의 플랜 ${n}문항</button>${L?`<button class="btn l" id="goRes">▶ 이어서 하기 · ${t[0]} ${esc(t[1])}</button>`:''}<div class="row"><button class="btn l" id="goSet">📝 실전 논술 세트</button><button class="btn l" id="goDisc">🔎 사례→개념</button></div></div>`;
  const f=app.firstElementChild;f?f.insertAdjacentHTML('afterend',h):app.insertAdjacentHTML('afterbegin',h);
  $('#goPlan').onclick=()=>start('plan');$('#goSet').onclick=setMenu;$('#goDisc').onclick=()=>start('disc');
  if($('#goRes'))$('#goRes').onclick=()=>{const {m,id}=st.last;start(m);const i=Q.findIndex(x=>x.id===id);if(i>=0&&i+1<Q.length){qi=i+1;show()}}}
+
+/* v23 요일 영역 · 이번 주 오답 정리 */
+const WDA={월:'교육과정 (2022 개정 포함)',화:'교수학습',수:'교육평가 + 교육행정',목:'교육심리 + 생활지도·상담',금:'교육사회 + 교육사·철학 + 기타'};
+const WDK=['월','화','수','목','금'];
+function wdToday(){return '일월화수목금토'[new Date().getDay()]}
+function wdSel(){try{const o=JSON.parse(localStorage.getItem('edu_wd_sel')||'null');if(o&&o.day===dk()&&WDK.includes(o.v))return o.v}catch(e){}const t=wdToday();return WDK.includes(t)?t:null}
+function wkStart(){const n=new Date();n.setHours(0,0,0,0);const g=n.getDay();return n.getTime()-((g+6)%7)*DAY}
+function wkPool(){const t0=wkStart(),A=st.wrAt||{};return shuf(DATA.items.filter(x=>A[x.id]&&A[x.id]>=t0)).sort((a,b)=>(st.wr[b.id]?1:0)-(st.wr[a.id]?1:0))}
+function wdPool(){const v=wdSel();if(!v)return [];const now=Date.now(),P=DATA.items.filter(x=>x.wd===v),G={S:0,A:1,B:2},isW=x=>x.k==='wt'||x.k==='pat'&&x.tpl;
+ const um=P.filter(isW),R=P.filter(x=>!isW(x));const due=R.filter(x=>st.sr[x.id]&&st.sr[x.id].d<=now).sort((a,b)=>st.sr[a.id].d-st.sr[b.id].d);
+ const nw=R.filter(x=>!st.sr[x.id]).sort((a,b)=>(G[a.g]??3)-(G[b.g]??3)||(a.r??1e9)-(b.r??1e9));
+ const rest=shuf(R.filter(x=>st.sr[x.id]&&st.sr[x.id].d>now));return [...due,...nw,...rest,...shuf(um)]}
+function wdHome(){const t=wdToday(),v=wdSel(),n=v?wdPool().length:0,w=wkPool().length,um=v?DATA.items.filter(x=>x.wd===v&&(x.k==='wt'||x.k==='pat'&&x.tpl)).length:0;
+ const msg=t==='토'?'토요일: 모의고사 한 회 60분 실전 → 채점 받기. 영역 카드는 아래에서 골라 풀 수 있어요.':t==='일'?'일요일: 이번 주 오답 정리의 날. 밀린 요일 영역도 아래에서 고르세요.':'오늘 루틴: 띵크맵 백지 위계 20분 → 영역 카드 60분 → 엄정석 틀 채우기 20분';
+ const h=`<div class="card"><h2>📅 요일 영역 루틴 <span class="meta" style="display:inline">오늘 ${t}요일</span></h2><div class="meta">${msg}</div><div class="chips" style="margin-top:6px">${WDK.map(k=>`<button class="chip ${v===k?'on':''}" data-wd="${k}">${k} · ${esc(WDA[k])}</button>`).join('')}</div>${v?`<button class="btn" id="goWd">📅 ${v}요일 영역 시작 · ${esc(WDA[v])} ${n}문항<br><small>복습 예정 → 새 카드(S등급·빈출 순) → 나머지 → 끝에 ✍️ 엄정석 틀 채우기·답안 작성 훈련 ${um}장</small></button>`:'<div class="meta">위에서 영역을 골라 주세요.</div>'}<button class="btn ${t==='일'?'':'l'}" id="goWk">🧹 이번 주 오답 정리 ${w}문항 <small>(월요일 0시 이후 틀린 카드)</small></button></div>`;
+ const f=app.firstElementChild;f?f.insertAdjacentHTML('afterend',h):app.insertAdjacentHTML('afterbegin',h);
+ app.querySelectorAll('[data-wd]').forEach(b=>b.onclick=()=>{localStorage.setItem('edu_wd_sel',JSON.stringify({day:dk(),v:b.dataset.wd}));home()});
+ if($('#goWd'))$('#goWd').onclick=()=>start('wday');$('#goWk').onclick=()=>{if(!w){toast('이번 주에 틀린 카드가 없어요 👍');return}start('wweek')}}
 /* 실전 논술 세트 */
 const SETAL=[['서론',4],['①',11],['②',11],['③',11],['④',11],['결론',4],['검토',8]];let SET=null,STI=null;
 function setMenu(){VIEW='setm';setNav('');$('#backBtn').hidden=false;$('#ttl').innerHTML='📝 <b>실전 논술 세트</b>';clearInterval(STI);const dr=JSON.parse(localStorage.getItem('edu_set_draft')||'null');
@@ -399,7 +417,7 @@ function wtMenu(){VIEW='wtm';clearInterval(WTI);setNav('');$('#backBtn').hidden=
 function v16Home(){const n=DATA.items.filter(x=>x.k==='wt').length;const g=app.querySelector('.grid');const h=`<button class="cta" id="goWt" style="margin-bottom:12px"><span class="ic">✍️</span><span><b>답안 작성 훈련 ${n}문항</b><small>비문 고치기 · 문장 틀 채우기 · 구조 배열 · 1분 개요 짜기</small></span></button>`;
  g?g.insertAdjacentHTML('beforebegin',h):app.insertAdjacentHTML('beforeend',h);$('#goWt').onclick=wtMenu;
  const m=app.querySelector('.mode[data-m="wt"]');if(m)m.onclick=e=>{e.stopPropagation();wtMenu()}}
-function home(){_home();v13Home();v16Home()}
+function home(){_home();v13Home();v16Home();wdHome()}
 function showWt(x){clearInterval(WTI);({fix:wtFix,frm:wtFrm,ord:wtOrd,out:wtOut}[x.s])(x)}
 function wtFix(x){const o=shuf([x.a,...x.x]);
  app.innerHTML=`${head(x)}<div class="card" style="margin-top:10px"><div class="meta">답안에 이렇게 썼다면? 직접 고쳐 쓰거나 아래에서 바른 문장을 고르세요.</div><div class="cq" style="color:var(--bad)">✖ ${esc(x.q)}</div><textarea id="ta" rows="2" ${IA} placeholder="고쳐 쓴 문장 (선택)"></textarea><button class="btn l" id="rv">고쳐 쓴 문장을 모범 교정문과 비교</button>${o.map((s,i)=>`<button class="opt" data-i="${i}"><span class="no_">${i+1}</span><span>${esc(s)}</span></button>`).join('')}<div id="ex"></div></div>`;
