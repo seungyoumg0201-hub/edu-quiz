@@ -122,6 +122,18 @@ st.hint=st.hint||{};const HU=new Set();
 function grade(id,ok){const r=st.sr[id]||{b:0,d:0};const hu=ok&&HU.has(id);if(hu){r.b=1;r.d=Date.now()+DAY;toast('💡 힌트 사용 → 약한 정답(1일 후 재복습)')}else{r.b=ok?Math.min(r.b+1,5):0;r.d=Date.now()+(ok?IV[r.b]*DAY:10*60e3)}st.sr[id]=r;
  const h=st.hist[id]||{c:0,w:0};ok?h.c++:h.w++;if(hu)h.hc=(h.hc||0)+1;st.hist[id]=h;if(!ok){st.wr[id]=(st.wr[id]||0)+1;try{window.eduMiss&&eduMiss(id)}catch(e){}}else if(!hu&&st.wr[id]&&r.b>=2){delete st.wr[id];(st.wrDel=st.wrDel||{})[id]=Date.now()}
  const k=dk();st.days[k]=(st.days[k]||0)+1;if(st.days[k]===GOAL)setTimeout(()=>toast('🎉 오늘 목표 '+GOAL+'문항 달성!'),300);save();buzz(ok?15:[30,40,30]);sess[ok?'c':'w']++;badge()}
+// v24: 중복 문항(dup) → 대표 문항으로 진도 이전, 목록에서는 숨김(ID·기록 호환 유지)
+const ALLI=DATA.items,DUP={};ALLI.forEach(x=>{if(x.dup)DUP[x.id]=x.dup});
+function migDup(o){if(!o||typeof o!=='object')return 0;let ch=0;const mx=(a,b)=>Math.max(a||0,b||0);
+ for(const d in DUP){const c=DUP[d];
+  if(o.sr&&o.sr[d]){const a=o.sr[c],b=o.sr[d];if(!a||(b.b||0)>(a.b||0))o.sr[c]=b;delete o.sr[d];ch=1}
+  if(o.wr&&o.wr[d]){o.wr[c]=(o.wr[c]||0)+o.wr[d];delete o.wr[d];ch=1}
+  if(o.hist&&o.hist[d]){const a=o.hist[c]||{c:0,w:0},b=o.hist[d],h={c:(a.c||0)+(b.c||0),w:(a.w||0)+(b.w||0)};if(a.hc||b.hc)h.hc=(a.hc||0)+(b.hc||0);if(a.p||b.p)h.p=(a.p||0)+(b.p||0);o.hist[c]=h;delete o.hist[d];ch=1}
+  if(o.hint&&o.hint[d]){o.hint[c]=(o.hint[c]||0)+o.hint[d];delete o.hint[d];ch=1}
+  for(const f of['wrAt','wrDel'])if(o[f]&&o[f][d]){o[f][c]=mx(o[f][c],o[f][d]);delete o[f][d];ch=1}}
+ return ch}
+if(migDup(st))save();
+DATA.items=ALLI.filter(x=>!x.dup);
 const CON=DATA.con,CI=Object.fromEntries(CON.map(c=>[c.id,c]));
 {const ids=new Set(DATA.items.map(x=>x.id));let ch=0;for(const k in st.wr)if(!ids.has(k)){delete st.wr[k];ch=1}if(ch)save()}
 const MODES={card:['🃏','암기카드','영역>개념별 앞·뒤 카드 · 알아요/모름'],case:['📝','사례형(제시문)','기출형 지문 → 개념 명칭 + 서술'],essay:['✍️','논술 문장 인출','정의·특징·한계·방안·2022 연계'],mcq:['🔘','객관식','기출 혼동 개념 오답 해설'],struct:['🧩','구조화 암기','N가지 고정 답 하나씩 공개'],frame:['🗂️','개념 전체 구조','구성요소 전부 인출'],short:['⌨️','단답형','직접 입력, 키워드 채점'],cloze:['🔤','구조화 빈칸','구조 문장 핵심어 빈칸'],prob:['🎯','예상발문','실제 발문 → 답안 작성 → 채점 키워드 체크'],kwr:['🔑','키워드 먼저','발문 보고 채점 키워드부터 인출'],disc:['🔎','사례→개념 판별','지문의 ㉠㉡이 어떤 개념인지 빠르게 판별'],l22:['📗','2022 연계 문장','이론을 총론 표현과 잇는 한 문장'],pat:['✒️','논술 문장 패턴','정의·장단점·방안·서론·결론 문장 틀'],wrong:['📕','오답노트','틀린 문항만 복습']};
@@ -253,7 +265,7 @@ function showStruct(x){let n=0;const P=x.p;app.innerHTML=`${head(x)}<div class="
  <div id="pts">${P.map((p,i)=>`<div class="pt" id="p${i}"><span class="num">${i+1}</span><span class="blank">______</span></div>`).join('')}</div><div id="hk"></div>
  <div class="row"><button class="btn l" id="all">모두 공개</button><button class="btn" id="rv">다음 공개 (1/${P.length})</button></div><div id="jd"></div></div>`;
  const open=i=>{const p=P[i];const e=$('#p'+i);e.classList.add('open');e.innerHTML=`<span class="num">${i+1}</span><b>${esc(p.k)}</b><br>${esc(p.s)}`};
- const fin=()=>{$('#rv').parentNode.style.display='none';if(x.h)$('#hk').innerHTML=`<div class="hook">💡 연상: ${esc(x.h)}</div>`;
+ const fin=()=>{$('#rv').parentNode.style.display='none';if(typeof x.h==='string'&&x.h)$('#hk').innerHTML=`<div class="hook">💡 연상: ${esc(x.h)}</div>`;if(x.note)$('#hk').innerHTML+=`<div class="hook">📎 함께 정리: ${esc(x.note)}</div>`;
   $('#jd').innerHTML=framePanel(x,false)+`<div class="row"><button class="btn r" id="no">일부/모름<kbd>←</kbd></button><button class="btn g" id="ok">${P.length}가지 다 맞힘<kbd>→</kbd></button></div>`;bindJudge(x.id)};
  $('#rv').onclick=()=>{open(n++);if(n>=P.length)fin();else $('#rv').textContent=`다음 공개 (${n+1}/${P.length})`};
  $('#all').onclick=()=>{while(n<P.length)open(n++);fin()};KEY=e=>{if(e.key==='Enter'||e.key===' ')$('#rv').click()}}
@@ -278,7 +290,7 @@ function showKwr(x){app.innerHTML=ybTop(x)+`<div class="meta" style="margin:6px 
 st.ans=st.ans||{};st.ad=st.ad||{};st.cfg=st.cfg||{};st.cfg.exam=st.cfg.exam||'2026-11-28';st.sets=st.sets||{};
 TT.plan=['🗓️','오늘의 플랜'];
 const UNDO=[];
-const II={};DATA.items.forEach(x=>II[x.id]=x);
+const II={};ALLI.forEach(x=>II[x.id]=x);
 function grade(id,ok){UNDO.push({s:JSON.stringify(st),qi,sess:{...sess},M});if(UNDO.length>30)UNDO.shift();
  const lv=ok===true?'g':ok===false?'n':ok,now=Date.now(),r=st.sr[id]||{b:0,d:0},hu=(lv==='g'||lv==='e')&&HU.has(id);
  if(hu){r.b=1;r.d=now+DAY;toast('💡 힌트 사용 → 약한 정답(1일 후 재복습)')}
@@ -479,7 +491,7 @@ function cloudLoad(){if(fbP)return fbP;const u=m=>`https://www.gstatic.com/fireb
  .catch(e=>{CL.st='fail';CL.msg=navigator.onLine?'클라우드 기능을 불러오지 못했어요':'오프라인 — 동기화는 온라인에서 돼요';fbP=null;cloudUI();throw e});return fbP}
 function eduRef(){return fb.D.ref(fb.rt,'review/'+CL.user.uid+'/devices/'+EDU_NODE)}
 // 병합: 로컬 기록을 절대 버리지 않음. 오답은 합집합(마지막 오답 시각 > 해제 시각이면 유지), 횟수·통계는 큰 값
-function mergeSt(c){if(!c||typeof c!=='object')return;const mx=(a,b)=>Math.max(a||0,b||0);st.wrAt=st.wrAt||{};st.wrDel=st.wrDel||{};
+function mergeSt(c){if(!c||typeof c!=='object')return;migDup(c);const mx=(a,b)=>Math.max(a||0,b||0);st.wrAt=st.wrAt||{};st.wrDel=st.wrDel||{};
  const ca=c.wrAt||{},cd=c.wrDel||{};for(const k in ca)st.wrAt[k]=mx(st.wrAt[k],ca[k]);for(const k in cd)st.wrDel[k]=mx(st.wrDel[k],cd[k]);
  const ids=new Set(DATA.items.map(x=>x.id)),all=new Set([...Object.keys(st.wr),...Object.keys(c.wr||{})]);
  for(const k of all){if(!ids.has(k))continue;const n=mx(st.wr[k],(c.wr||{})[k]);if((st.wrAt[k]||1)>(st.wrDel[k]||0))st.wr[k]=n;else delete st.wr[k]}
@@ -495,7 +507,7 @@ async function cloudPush(force){if(!fb||!CL.user)return;if(!force&&!CL.dirty)ret
 var _cpT=null;window.cloudDirty=()=>{if(!CL.user)return;CL.dirty=true;cloudUI();clearTimeout(_cpT);_cpT=setTimeout(()=>cloudPush().catch(e=>{CL.msg='⚠️ 동기화 실패: '+(e.code||'');cloudUI()}),4000)};
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&CL.dirty)cloudPush().catch(()=>{})});
 // 오답 1건 = 실시간 로그(review/<uid>/misses, d:'edu'). 비로그인 시 대기열에 보관 후 로그인 때 업로드
-function missObj(id){const x=DATA.items.find(i=>i.id===id)||{};return {at:Date.now(),d:'edu',id:id,k:String(x.k||''),area:String(x.d||'').slice(0,60),q:String(x.q||'').replace(/<[^>]+>/g,'').slice(0,200),n:st.wr[id]||1}}
+function missObj(id){const x=ALLI.find(i=>i.id===id)||{};return {at:Date.now(),d:'edu',id:id,k:String(x.k||''),area:String(x.d||'').slice(0,60),q:String(x.q||'').replace(/<[^>]+>/g,'').slice(0,200),n:st.wr[id]||1}}
 window.eduMiss=(id,lv)=>{st.wrAt=st.wrAt||{};st.wrAt[id]=Date.now();const o=missObj(id);if(lv)o.lv=lv;if(fb&&CL.user){fb.D.push(fb.D.ref(fb.rt,'review/'+CL.user.uid+'/misses'),o).catch(()=>{queueMiss(o)})}else queueMiss(o)};
 function queueMiss(o){const q=JSON.parse(localStorage.getItem('edu_missq')||'[]');q.push(o);while(q.length>2000)q.shift();localStorage.setItem('edu_missq',JSON.stringify(q))}
 async function missBackfill(){const q=JSON.parse(localStorage.getItem('edu_missq')||'[]');const first=!localStorage.getItem('edu_missbf');
