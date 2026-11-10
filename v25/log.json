@@ -1,0 +1,974 @@
+{
+ "conv": [
+  "v4onlinek1",
+  "v4onlinek2",
+  "v4onlinek3",
+  "v4lok1",
+  "v4lok2",
+  "v4lok3",
+  "v4lok4",
+  "v4lok5",
+  "v4coopk1",
+  "v4coopk2",
+  "v4coopk3",
+  "v4adm_etck1",
+  "v4adm_etck2",
+  "v4adm_etck3",
+  "v4adm_etck4",
+  "v4equalk1",
+  "v4equalk2",
+  "v4equalk3",
+  "v4equalk4",
+  "v4integk1",
+  "v4integk2",
+  "v4integk3",
+  "v4marciak1",
+  "v4marciak2",
+  "v4marciak3",
+  "v4marciak4",
+  "v4k_humank1",
+  "v4k_humank2",
+  "v4k_humank3",
+  "v4k_humank4",
+  "v4k_humank5",
+  "v4k_humank6",
+  "v4k_humank7",
+  "v4k_humank8",
+  "v4k_humank9",
+  "v4k_humank10",
+  "v4gagnek1",
+  "v4gagnek2",
+  "v4gagnek3",
+  "v4gagnek4",
+  "v4gagnek5",
+  "v4gagnek6",
+  "v4gagnek7",
+  "v4gagnek8",
+  "v4gagnek9",
+  "v4perfk2",
+  "v4leadk2",
+  "v4leadk3",
+  "v4vygk1",
+  "v4vygk2",
+  "v4erikk966",
+  "v4hidk1",
+  "v4sbcdk2",
+  "v4sbcdk3",
+  "v4sbcdk4",
+  "v4sbcdk5",
+  "v4tylerk1109",
+  "v4cur_bk1095",
+  "v4cur_bk1096",
+  "v4cur_bk1098",
+  "v4cur_bk1099",
+  "v4cur_bk1100",
+  "v4formk1",
+  "v4formk3",
+  "v4sbmk1079",
+  "v4sitlk921",
+  "v4clek2",
+  "v4clek3",
+  "v4clek5",
+  "v4clek6"
+ ],
+ "weak": [
+  "s9",
+  "s39",
+  "s48",
+  "s61",
+  "s72",
+  "s150",
+  "s161",
+  "v4expk1026"
+ ],
+ "fix": [
+  "v4expk992",
+  "v4cur_bk982",
+  "v4expk1036",
+  "v4walkerk1093",
+  "v4emodelk1156",
+  "v4philk1040",
+  "v4philk3",
+  "v4supk5",
+  "v4supk7",
+  "v4delink0",
+  "v4colemk0",
+  "v4behcok908",
+  "v4ipk2",
+  "v4srk1",
+  "v4hidk1215"
+ ],
+ "disc_x": [
+  [
+   "v4hidc0d0",
+   [
+    "영 교육과정",
+    "기회의 원리와 만족의 원리",
+    "경험중심 교육과정"
+   ],
+   [
+    "영 교육과정",
+    "공식적 교육과정",
+    "실천된 교육과정"
+   ]
+  ],
+  [
+   "v4hidc0d1",
+   [
+    "잠재적 교육과정",
+    "기회의 원리와 만족의 원리",
+    "경험중심 교육과정"
+   ],
+   [
+    "잠재적 교육과정",
+    "공식적 교육과정",
+    "실천된 교육과정"
+   ]
+  ],
+  [
+   "v4hidc1d0",
+   [
+    "영 교육과정",
+    "기회의 원리와 만족의 원리",
+    "경험중심 교육과정"
+   ],
+   [
+    "영 교육과정",
+    "공식적 교육과정",
+    "실천된 교육과정"
+   ]
+  ],
+  [
+   "v4tylerc0d2",
+   [
+    "계속성",
+    "계열성",
+    "교육철학"
+   ],
+   [
+    "학습 가능성의 원리와 일경험 다성과의 원리",
+    "계속성과 계열성",
+    "교육철학과 학습심리학"
+   ]
+  ],
+  [
+   "v4expc0d1",
+   [
+    "경험중심 교육과정",
+    "나선형 교육과정",
+    "경험중심(Dewey)"
+   ],
+   [
+    "경험중심 교육과정",
+    "나선형 교육과정",
+    "광역형"
+   ]
+  ],
+  [
+   "v4expc0d2",
+   [
+    "경험중심 교육과정",
+    "중핵형",
+    "경험중심(Dewey)"
+   ],
+   [
+    "경험중심 교육과정",
+    "중핵형",
+    "광역형"
+   ]
+  ],
+  [
+   "v4expmk1d0",
+   [
+    "경험중심 교육과정",
+    "경험중심(Dewey)",
+    "학문중심(Bruner)"
+   ],
+   [
+    "경험중심 교육과정",
+    "학문중심(Bruner)",
+    "인간중심 교육과정"
+   ]
+  ],
+  [
+   "v4integc0d0",
+   [
+    "다학문적 통합",
+    "탈학문적 통합",
+    "잠재적 교육과정"
+   ],
+   [
+    "다학문적 통합",
+    "탈학문적 통합",
+    "광역형"
+   ]
+  ],
+  [
+   "v4integc0d1",
+   [
+    "간학문적 통합",
+    "탈학문적 통합",
+    "잠재적 교육과정"
+   ],
+   [
+    "간학문적 통합",
+    "탈학문적 통합",
+    "광역형"
+   ]
+  ],
+  [
+   "v4integc0d2",
+   [
+    "간학문적 통합",
+    "다학문적 통합",
+    "잠재적 교육과정"
+   ],
+   [
+    "간학문적 통합",
+    "다학문적 통합",
+    "광역형"
+   ]
+  ],
+  [
+   "v4pblc0d1",
+   [
+    "문제중심학습",
+    "프로젝트 학습",
+    "인지 도구"
+   ],
+   [
+    "지식 전달자",
+    "강의자",
+    "감독자"
+   ]
+  ],
+  [
+   "v4onlinec0d0",
+   [
+    "플립드 러닝",
+    "블렌디드 러닝",
+    "인지 도구"
+   ],
+   [
+    "플립드 러닝",
+    "블렌디드 러닝",
+    "학습자-교수자 상호작용"
+   ]
+  ],
+  [
+   "v4onlinec0d1",
+   [
+    "학습자-학습자 상호작용",
+    "블렌디드 러닝",
+    "인지 도구"
+   ],
+   [
+    "학습자-학습자 상호작용",
+    "블렌디드 러닝",
+    "학습자-내용 상호작용"
+   ]
+  ],
+  [
+   "v4coopc0d1",
+   [
+    "Jigsaw",
+    "긍정적 상호의존",
+    "개별 책무성"
+   ],
+   [
+    "모집단(원래 모둠)",
+    "STAD 학습팀",
+    "개별 책무성"
+   ]
+  ],
+  [
+   "v4orgc0d1",
+   [
+    "규칙과 규정",
+    "관료제(Weber)",
+    "변혁적 지도성"
+   ],
+   [
+    "관료제(Weber)",
+    "조직화된 무질서",
+    "비공식조직"
+   ]
+  ],
+  [
+   "v4orgmk7d0",
+   [
+    "관료제(Weber)",
+    "규칙과 규정",
+    "변혁적 지도성"
+   ],
+   [
+    "관료제(Weber)",
+    "조직화된 무질서",
+    "비공식조직"
+   ]
+  ],
+  [
+   "v4supc0d0",
+   [
+    "임상장학",
+    "컨설팅 장학",
+    "규칙과 규정"
+   ],
+   [
+    "임상장학",
+    "컨설팅 장학",
+    "자기장학"
+   ]
+  ],
+  [
+   "v4supc0d1",
+   [
+    "전문적 학습공동체",
+    "컨설팅 장학",
+    "규칙과 규정"
+   ],
+   [
+    "전문적 학습공동체",
+    "컨설팅 장학",
+    "약식장학"
+   ]
+  ],
+  [
+   "v4supmk0d0",
+   [
+    "임상장학",
+    "규칙과 규정",
+    "이완결합체제"
+   ],
+   [
+    "임상장학",
+    "동료장학",
+    "자기장학"
+   ]
+  ],
+  [
+   "v4adm_etcc0d0",
+   [
+    "만족 모형",
+    "점증 모형",
+    "규칙과 규정"
+   ],
+   [
+    "만족 모형",
+    "점증 모형",
+    "합리 모형"
+   ]
+  ],
+  [
+   "v4planc0d0",
+   [
+    "교육정책",
+    "규칙과 규정",
+    "이완결합체제"
+   ],
+   [
+    "교육정책",
+    "교육재정",
+    "교육평가"
+   ]
+  ],
+  [
+   "v4lead_bc0d0",
+   [
+    "공식조직",
+    "규칙과 규정",
+    "이완결합체제"
+   ],
+   [
+    "공식조직",
+    "관료제(Weber)",
+    "이완결합체제"
+   ]
+  ],
+  [
+   "v4src0d2",
+   [
+    "성취 경험",
+    "대리 경험",
+    "자기효능감"
+   ],
+   [
+    "자기효능감",
+    "관찰학습",
+    "언어적 설득"
+   ]
+  ],
+  [
+   "v4vygc0d1",
+   [
+    "근접발달영역",
+    "사적 언어",
+    "Vygotsky"
+   ],
+   [
+    "근접발달영역",
+    "사적 언어",
+    "인지적 갈등(평형화)"
+   ]
+  ],
+  [
+   "v4ipc0d2",
+   [
+    "조직화",
+    "정교화",
+    "성취 경험"
+   ],
+   [
+    "조직화",
+    "정교화",
+    "시연"
+   ]
+  ],
+  [
+   "v4gardc0d0",
+   [
+    "대인관계지능",
+    "개인내적지능",
+    "성취 경험"
+   ],
+   [
+    "삼원지능이론(Sternberg)",
+    "일반지능(g) 이론",
+    "유동·결정지능 이론(Cattell)"
+   ]
+  ],
+  [
+   "v4careerc0d1",
+   [
+    "Holland",
+    "Super",
+    "REBT"
+   ],
+   [
+    "탐구형",
+    "진취형",
+    "예술형"
+   ]
+  ],
+  [
+   "v4equalc0d0",
+   [
+    "낙인이론",
+    "보장적 평등",
+    "REBT"
+   ],
+   [
+    "보장적 평등",
+    "과정적(조건적) 평등",
+    "허용적 평등"
+   ]
+  ],
+  [
+   "v4equalc0d1",
+   [
+    "결과적 평등",
+    "보장적 평등",
+    "REBT"
+   ],
+   [
+    "사회통제이론",
+    "차별접촉이론",
+    "아노미이론"
+   ]
+  ],
+  [
+   "v4philc0d0",
+   [
+    "규범적 준거",
+    "인지적 준거",
+    "REBT"
+   ],
+   [
+    "진보주의 교육",
+    "재건주의 교육",
+    "직업교육(도구적 교육)"
+   ]
+  ],
+  [
+   "v4k_autoc0d1",
+   [
+    "학교자율시간",
+    "창의적 체험활동",
+    "Skilbeck"
+   ],
+   [
+    "학교자율시간",
+    "학업성취율",
+    "공통과목"
+   ]
+  ],
+  [
+   "v4eval_viewc0d0",
+   [
+    "리커트 척도",
+    "측정관",
+    "총평관"
+   ],
+   [
+    "리커트 척도",
+    "표준화 검사",
+    "수행평가"
+   ]
+  ],
+  [
+   "v4eval_viewc0d1",
+   [
+    "CAT",
+    "측정관",
+    "총평관"
+   ],
+   [
+    "CAT",
+    "의미변별척도",
+    "사회성 측정법"
+   ]
+  ],
+  [
+   "v4motv_admc0d0",
+   [
+    "공정성 이론",
+    "동기요인",
+    "위생요인"
+   ],
+   [
+    "공정성 이론",
+    "기대 이론",
+    "욕구위계 이론"
+   ]
+  ],
+  [
+   "v4motv_admc0d1",
+   [
+    "동기-위생 이론",
+    "동기요인",
+    "위생요인"
+   ],
+   [
+    "동기-위생 이론",
+    "기대 이론",
+    "욕구위계 이론"
+   ]
+  ],
+  [
+   "v4mediac0d0",
+   [
+    "Kozma",
+    "PSI",
+    "학습보조원"
+   ],
+   [
+    "Kozma",
+    "Dale",
+    "Hoban"
+   ]
+  ],
+  [
+   "v4mediac0d1",
+   [
+    "Clark",
+    "PSI",
+    "학습보조원"
+   ],
+   [
+    "Clark",
+    "Dale",
+    "Hoban"
+   ]
+  ],
+  [
+   "v4mediac1d1",
+   [
+    "PSI",
+    "Clark",
+    "Kozma"
+   ],
+   [
+    "PSI(개별화 교수체제)",
+    "완전학습 기준(숙달 기준)",
+    "동기유발용 강의"
+   ]
+  ],
+  [
+   "v4inst_bmk10d0",
+   [
+    "선행조직자(Ausubel)",
+    "발견학습(Bruner)",
+    "인지 도구"
+   ],
+   [
+    "학습자 분석",
+    "과제 분석",
+    "환경 분석"
+   ]
+  ],
+  [
+   "v4lomk3d0",
+   [
+    "정신모형",
+    "공유비전",
+    "규칙과 규정"
+   ],
+   [
+    "Weick",
+    "Mintzberg",
+    "Sergiovanni"
+   ]
+  ]
+ ],
+ "disc_q": [
+  "v4lomk3d0"
+ ],
+ "disc_h": [
+  "v4hidc0d0",
+  "v4hidc0d1",
+  "v4tylerc0d2",
+  "v4expc0d0",
+  "v4expc0d1",
+  "v4expc0d2",
+  "v4snyderc0d0",
+  "v4snyderc0d1",
+  "v4sbcdc0d1",
+  "v4bwdc0d1",
+  "v4bwdc0d2",
+  "v4integc0d0",
+  "v4integc0d1",
+  "v4integc0d2",
+  "v4pblc0d1",
+  "v4onlinec0d0",
+  "v4onlinec0d1",
+  "v4coopc0d1",
+  "v4refc0d0",
+  "v4refc0d1",
+  "v4vrc0d0",
+  "v4vrc0d1",
+  "v4vrc0d2",
+  "v4perfc0d0",
+  "v4perfc0d1",
+  "v4emodelc0d0",
+  "v4emodelc0d1",
+  "v4eval_viewc0d0",
+  "v4eval_viewc0d1",
+  "v4orgc0d1",
+  "v4supc0d0",
+  "v4supc0d1",
+  "v4adm_etcc0d0",
+  "v4planc0d0",
+  "v4motv_admc0d0",
+  "v4motv_admc0d1",
+  "v4lead_bc0d0",
+  "v4src0d2",
+  "v4vygc0d1",
+  "v4motivc0d0",
+  "v4motivc0d1",
+  "v4ipc0d2",
+  "v4gardc0d0",
+  "v4careerc0d1",
+  "v4socioc0d0",
+  "v4socioc0d1",
+  "v4equalc0d0",
+  "v4equalc0d1",
+  "v4philc0d0",
+  "v4k_autoc0d1",
+  "v4hidc1d0",
+  "v4eval_viewc1d1",
+  "v4mediac0d0",
+  "v4mediac0d1",
+  "v4mediac1d1",
+  "v4supmk0d0",
+  "v4expmk1d0",
+  "v4expmk1d1",
+  "v4vrmk2d0",
+  "v4lomk3d0",
+  "v4refmk5d0",
+  "v4orgmk7d0",
+  "v4bwdmk8d0",
+  "v4formmk9d0",
+  "v4inst_bmk10d0",
+  "v4perfmk13d0"
+ ],
+ "mcq": [
+  "v4clem0",
+  "v4srm0"
+ ],
+ "struct": [
+  "st59"
+ ],
+ "new": [
+  "v4vrk1270",
+  "v4vrk1271",
+  "v4vrk1272",
+  "v4vrk1273",
+  "v4lok1274",
+  "v4leadk1275",
+  "v4srk1276"
+ ],
+ "hint_items": [
+  "s1",
+  "s5",
+  "s7",
+  "s8",
+  "s11",
+  "s13",
+  "s14",
+  "s15",
+  "s18",
+  "s19",
+  "s20",
+  "s21",
+  "s25",
+  "s26",
+  "s29",
+  "s30",
+  "s35",
+  "s36",
+  "s37",
+  "s40",
+  "s41",
+  "s42",
+  "s44",
+  "s45",
+  "s50",
+  "s55",
+  "s56",
+  "s58",
+  "s59",
+  "s64",
+  "s73",
+  "s77",
+  "s78",
+  "s80",
+  "s81",
+  "s82",
+  "s84",
+  "s87",
+  "s88",
+  "s89",
+  "s90",
+  "s91",
+  "s92",
+  "s93",
+  "s97",
+  "s99",
+  "s104",
+  "s106",
+  "s107",
+  "s115",
+  "s124",
+  "s125",
+  "s147",
+  "s151",
+  "s152",
+  "v4expk4c",
+  "v4expk981",
+  "v4expk991",
+  "v4expk993",
+  "v4expk995",
+  "v4expk997",
+  "v4expk1000",
+  "v4expk1001",
+  "v4expk1003",
+  "v4expk1004",
+  "v4expk1007",
+  "v4expk1025",
+  "v4expk1032",
+  "v4expk1039",
+  "v4expk1041",
+  "v4expk1132",
+  "v4expk1133",
+  "v4expk1134",
+  "v4hidk1023",
+  "v4hidk1024",
+  "v4hidk1056",
+  "v4hidk7",
+  "v4tylerk6",
+  "v4tylerk976",
+  "v4tylerk977",
+  "v4tylerk984",
+  "v4tylerk1008",
+  "v4tylerk1016",
+  "v4tylerk1017",
+  "v4tylerk1018",
+  "v4tylerk1019",
+  "v4tylerk1027",
+  "v4tylerk1103",
+  "v4tylerk1104",
+  "v4tylerk1105",
+  "v4tylerk1106",
+  "v4tylerk1107",
+  "v4tylerk1108",
+  "v4tylerk1110",
+  "v4tylerk1111",
+  "v4tylerk1112",
+  "v4tylerk1113",
+  "v4tylerk1114",
+  "v4tylerk1115",
+  "v4tylerk1116",
+  "v4tylerk1117",
+  "v4tylerk1118",
+  "v4tylerk8",
+  "v4sbcdk9",
+  "v4sbcdk979",
+  "v4sbcdk1033",
+  "v4sbcdk1034",
+  "v4sbcdk1082",
+  "v4sbcdk1083",
+  "v4sbcdk1120",
+  "v4sbcdk1122",
+  "v4sbcdk1123",
+  "v4sbcdk1124",
+  "v4sbcdk1125",
+  "v4onlinek7",
+  "v4onlinek9",
+  "v4snyderk1057",
+  "v4snyderk1058",
+  "v4walkerk1028",
+  "v4walkerk1086",
+  "v4walkerk1087",
+  "v4walkerk1088",
+  "v4walkerk1089",
+  "v4walkerk1090",
+  "v4walkerk1091",
+  "v4vrk0",
+  "v4vrk975",
+  "v4vrk1076",
+  "v4vrk9",
+  "v4orgk1070",
+  "v4orgk8",
+  "v4leadk0",
+  "v4plck3",
+  "v4clek0",
+  "v4lok0",
+  "v4scultk915",
+  "v4apprk0",
+  "v4bwdk6",
+  "v4bwdk1022",
+  "v4bwdk1126",
+  "v4bwdk1127",
+  "v4bwdk1128",
+  "v4bwdk1129",
+  "v4bwdk1130",
+  "v4pblk6",
+  "v4pblk1066",
+  "v4k_autok0",
+  "v4k_autok985",
+  "v4k_autok7",
+  "v4k_evalk0",
+  "v4k_evalk2",
+  "v4k_focusk0",
+  "v4k_focusk8",
+  "v4k_humank0",
+  "v4k_humank11",
+  "v4k_humank12",
+  "v4k_humank1085",
+  "v4k_matchk0",
+  "v4k_matchk1",
+  "v4k_matchk5",
+  "v4adm_etck0",
+  "v4catk0",
+  "v4eval_viewk969",
+  "v4vygk0",
+  "v4vygk6",
+  "v4coopk4j",
+  "v4coopk4s",
+  "v4coopk4g",
+  "v4gardk4",
+  "v4gagnek11",
+  "v4dickk0",
+  "v4dickk927",
+  "v4isdk0",
+  "v4isdk1060",
+  "v4integk1042",
+  "v4integk1043",
+  "v4integk1044",
+  "v4behcok0",
+  "v4counsk0",
+  "v4marciak5",
+  "v4sbmk935",
+  "v4sbmk1080",
+  "v4sbmk1081",
+  "v4lead_bk937",
+  "v4cur_bk0",
+  "v4cur_bk940",
+  "v4cur_bk1094",
+  "v4cur_bk1097",
+  "v4tabak943",
+  "v4tabak983",
+  "v4tabak1020",
+  "v4adamsk0",
+  "v4motv_admk0",
+  "v4motv_admk955",
+  "v4cippk0",
+  "v4inst_bk0",
+  "v4mediak0",
+  "v4mediak989",
+  "v4mediak990",
+  "v4recipk0",
+  "v4scrivk960",
+  "v4stdtk0",
+  "v4tylerk1147",
+  "v4tylerk1148",
+  "v4tylerk1149",
+  "v4tylerk1150",
+  "v4tylerk1151",
+  "v4tylerk1152",
+  "v4tylerk1153",
+  "v4tabak1154",
+  "v4tabak1155",
+  "v4tabak1200",
+  "v4tabak1201",
+  "v4tabak1202",
+  "v4tabak1203",
+  "v4tabak1205",
+  "v4tabak1206",
+  "v4tabak1207",
+  "v4tylerk1157",
+  "v4hidk1216",
+  "v4expk1222",
+  "v4expk1223",
+  "v4expk1224",
+  "v4walkerk1225",
+  "v4walkerk1226",
+  "v4walkerk1227",
+  "v4tylerk1228",
+  "v4tylerk1229",
+  "v4expk1237",
+  "v4expk1238",
+  "v4expk1240",
+  "v4expk1243",
+  "v4expk1244",
+  "v4expk1245",
+  "v4expk1246",
+  "v4expk1247",
+  "v4expk1248",
+  "v4expk1249",
+  "v4expk1250",
+  "v4expk1251",
+  "v4tylerk1253",
+  "v4tylerk1254",
+  "v4sbcdk1257",
+  "v4tylerk1258",
+  "v4tylerk1259",
+  "v4tylerk1260",
+  "v4tylerk1261",
+  "v4cur_bk1262",
+  "v4integk1263",
+  "v4k_autok1264",
+  "v4expk1265",
+  "v4expk1266",
+  "v4expk1267",
+  "v4apprk1268",
+  "v4refk1269"
+ ],
+ "hint_stat": {
+  "무관한 개념 틀 제거": 143,
+  "비슷한 질문 제거": 143,
+  "첫 글자 단서 생성": 16,
+  "잘린 힌트 제거": 35,
+  "뼈대 새로 생성": 23
+ }
+}
