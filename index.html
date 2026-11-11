@@ -536,11 +536,12 @@ function v13Home(){const D=dday(),v=rdSel(),n=planPool().length,R=RETS(),L=st.la
  $('#goPlan').onclick=()=>start('plan');$('#goSet').onclick=setMenu;$('#goDisc').onclick=()=>start('disc');$('#goRetAll').onclick=()=>start('ret');$('#goPlan0').onclick=()=>start('plan0');
  if($('#goRes'))$('#goRes').onclick=()=>{const {m,id}=st.last;start(m);const i=Q.findIndex(x=>x.id===id);if(i>=0&&i+1<Q.length){qi=i+1;show()}}}
 function showRet(x){const c=CI[x.c]||{};
- app.innerHTML=`${head(x)}<div class="card" style="margin-top:10px"><div class="psg">${esc(x.ctx)}</div><div class="retq">${esc(x.q)}</div><div class="meta">채점 요소 ${x.el.length}개 · 요소마다 전부 아니면 0점 · 공식 명칭으로 쓰기</div>
+ const hd=(c.n&&head(x).includes(esc(c.n)))?head(x).split(esc(c.n)).join('🔒 개념명은 채점 후 공개'):head(x);
+ app.innerHTML=`${hd}<div class="card" style="margin-top:10px"><div class="psg">${esc(x.ctx)}</div><div class="retq">${esc(x.q)}</div><div class="meta">채점 요소 ${x.el.length}개 · 요소마다 전부 아니면 0점 · 공식 명칭으로 쓰기</div>
  <textarea id="ta" rows="9" ${IA} placeholder="기억나는 대로 써 보세요. ㉠ 명칭 → 개념 → 방안 순서로. (Ctrl+Enter = 자기 채점)"></textarea>
  <div class="row" id="rbt"><button class="btn l" id="sh">모르겠음 · 모범답안 보기</button><button class="btn" id="ck">자기 채점<kbd>Ctrl+Enter</kbd></button></div><div id="ex"></div></div>`;
  const fin=typed=>{const t=$('#ta').value,auto=x.el.map(e=>!!(typed&&t.trim()&&e.kw&&e.kw.length&&kwHits(t,e.kw).every(z=>z.hit)));$('#rbt').style.display='none';
-  $('#ex').innerHTML=`<div class="crit">📏 ${esc(x.crit||'')}</div><div class="meta" style="margin-top:6px">모범답안과 비교해 <b>맞게 쓴 요소만</b> 체크하세요 (숫자키 1–${x.el.length}). '자동 감지'는 핵심어가 보인다는 표시일 뿐이고, 판정은 직접 합니다.</div>`+
+  $('#ex').innerHTML=`${c.n?`<div class="meta">🔓 개념: <b>${esc(c.n)}</b></div>`:''}<div class="crit">📏 ${esc(x.crit||'')}</div><div class="meta" style="margin-top:6px">모범답안과 비교해 <b>맞게 쓴 요소만</b> 체크하세요 (숫자키 1–${x.el.length}). '자동 감지'는 핵심어가 보인다는 표시일 뿐이고, 판정은 직접 합니다.</div>`+
   x.el.map((e,i)=>`<label class="rel ${auto[i]?'on':''}"><input type="checkbox" ${auto[i]?'checked':''}><div><span class="nm">${i+1}. ${esc(e.n)}</span>${auto[i]?'<span class="au">자동 감지</span>':''}<div>${esc(e.a)}</div></div>${e.x?`<div class="x">0점 주의: ${esc(e.x)}</div>`:''}</label>`).join('')+
   ((c.mn&&c.mn.length)?`<div class="mnb">🧩 네 암기법<br>${c.mn.map(esc).join('<br>')}</div>`:'')+
   `<div class="meta">근거: ${esc(x.src||'교재 표준')}</div><button class="btn" id="rfin">채점 확정 · <span id="rsc"></span><kbd>Enter</kbd></button>`+framePanel(x,false);
