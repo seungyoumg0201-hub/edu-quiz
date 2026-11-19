@@ -689,6 +689,95 @@ function wrView(){VIEW='wr';setNav('');$('#ttl').innerHTML='✍️ <b>답안 작
 function v30Home(){var h='<div class="card wrh"><h2 style="margin:0 0 4px">✍️ 답안 작성 전략</h2><div class="meta">서론 3문장·결론 틀을 주제만 바꿔 직접 써 보는 연습 + 구성 감점 체크리스트 + 15/40/5 시간 계획. 배점은 공식 루브릭(내용 15 + 구성·표현 5) 그대로.</div><div class="row"><button class="btn l" id="goWr">✍️ 서론·결론 연습하기</button></div></div>';
  var p=app.querySelector('.card.kqh')||app.querySelector('.card.plan');p?p.insertAdjacentHTML('afterend',h):app.insertAdjacentHTML('afterbegin',h);$('#goWr').onclick=wrView}
 
+/* ===== v32: 5일 회차 간격 인출 · 양방향(개념→장면) 선택 변형 · 동어반복 금지어 · 하이브리드 오답 · 기출 근거 · 그림 문항 ===== */
+(function(){var s=document.createElement('style');s.textContent='.qimg{display:block;max-width:100%;max-height:420px;margin:10px auto;border:1px solid var(--line);border-radius:10px;background:#fff}.ban32{margin-top:6px;padding:8px 10px;border-left:3px solid var(--bad);background:var(--bads);border-radius:8px;font-size:14px}.hy32{margin-top:6px;padding:8px 10px;border-left:3px solid var(--warn);background:var(--warns);border-radius:8px;font-size:14px}.gx32{margin-top:6px;font-size:13px;color:var(--mut)}.rd32{display:flex;gap:6px;margin:8px 0}.rd32 i{flex:1;font-style:normal;text-align:center;font-size:12px;padding:6px 0;border-radius:8px;background:var(--bd);color:var(--mut)}.rd32 i.on{background:var(--acc);color:#fff}.rd32 i.dn{background:var(--accs);color:var(--acc)}.pk32 .opt small.why{display:block}';document.head.appendChild(s)})();
+var R32_DAYS=5,R32_START=2;/* KQ0(11-11)+2 = 11-13이 1회차 1일째 */
+function kqRound(t){var d=t-R32_START;if(d<0)return {r:-1,day:0};return {r:Math.floor(d/R32_DAYS),day:d%R32_DAYS}}
+function kqRS(r){return R32_START+r*R32_DAYS}
+function kqOrd(x){return (x.ord&&x.ord.length)?x.ord:x.qs.map(function(_,i){return i})}
+function kqDate(t){var d=new Date(KQ0.getTime()+t*DAY);return (d.getMonth()+1)+'/'+d.getDate()}
+kqDue=function(){var S=kqS(),t=kqIdx(),X=kqExamIdx(),R=kqRound(t);return KQS().filter(function(x){var s=S[x.id];
+ if(R.r<0){if(!s)return x.kf<=t||(X-t)<=8;return s.due<=t}
+ if(s&&s.due!=null&&s.due<=t&&s.lt!==t)return true;
+ return !(s&&s.rd===R.r)&&(x.sl||0)<=R.day})};
+kqPool=function(){var S=kqS(),t=kqIdx(),L=kqDue().slice();L.sort(function(a,b){var A=S[a.id]||{n:0,m:0,h:[]},B=S[b.id]||{n:0,m:0,h:[]};
+ var la=(A.h&&A.h.length&&!A.h[A.h.length-1][1])?1:0,lb=(B.h&&B.h.length&&!B.h[B.h.length-1][1])?1:0;
+ return (lb-la)||((b.wk|0)-(a.wk|0))||((a.sl|0)-(b.sl|0))||((b.hot|0)-(a.hot|0))||(A.n-B.n)});return L.slice(0,70)};
+kqRecord=function(x,ok){var S=kqS(),t=kqIdx(),R=kqRound(t),s=S[x.id]||{n:0,m:0,v:0,due:t,h:[]},O=kqOrd(x);s.h=s.h||[];s.h.push([t,ok?1:0,O[(s.v||0)%O.length]]);if(s.h.length>16)s.h.shift();s.v=((s.v||0)+1)%O.length;s.lt=t;
+ if(ok){s.n++;if(R.r>=0){s.rd=R.r;var nx=kqRS(R.r+1)+(x.sl||0);s.due=x.wk?Math.min(t+2,nx):nx}else{s.due=t+(s.n===1?3:5)}}
+ else{s.m++;s.due=t+1}
+ S[x.id]=s;kqSave(S)};
+function banList(x,v){var B=(x.ban||[]).slice(),cl=(x.cl&&x.cl[v])||'';(cl.match(/\[\[(.+?)\]\]/g)||[]).forEach(function(m){var w=m.slice(2,-2).trim();if(w.length>=2&&B.indexOf(w)<0)B.push(w)});return B}
+function v32Back(x,v,t,auto){var h='',B=banList(x,v);
+ if(B.length){var hit=t?B.filter(function(w){return norm(t).indexOf(norm(w))>=0}):[];
+  h+='<div class="ban32">🚫 <b>동어반복 금지어</b> — 지문·발문의 말을 일상어로 되풀이하면 0점: '+B.map(esc).join(' · ')+(hit.length&&!auto?'<br><b>⚠️ 내 답에 \''+hit.map(esc).join('\', \'')+'\'이(가) 있지만 공식 명칭이 없어 0점</b>':'')+'</div>'}
+ if(x.hy&&x.hy.length)h+='<div class="hy32">⚠️ <b>하이브리드 오답</b>(두 용어를 섞은 가짜 명칭 → 0점): '+x.hy.map(esc).join(' · ')+'</div>';
+ if(x.gx&&x.gx.length)h+='<div class="gx32">📎 기출 근거 '+x.gx.length+'건: '+x.gx.slice(0,6).map(esc).join(' / ')+(x.gx.length>6?' 외 '+(x.gx.length-6)+'건':'')+'</div>';
+ return h}
+function kqTail(x,v){return '<div class="crit">📌 한 줄 의미: '+esc(x.mean)+'</div>'+(x.plan?'<div class="crit">🛠 적용·방안: '+esc(x.plan)+'</div>':'')+(x.mn?'<div class="mnb">🧩 네 암기법<br>'+esc(x.mn)+'</div>':'')+(x.src30?'<div class="meta">출처: '+esc(x.src30)+'</div>':'')+
+ '<details class="frp"><summary>다른 단서로도 확인</summary>'+x.cl.map(function(cc,i){return (i===v||(x.pk&&x.pk[i]))?'':'<div class="cu">· '+esc(x.ct[i])+': '+hlCue(cc)+'</div>'}).join('')+'</details>'}
+showKq=function(x){var S=kqS(),s=S[x.id]||{n:0,m:0,v:0},O=kqOrd(x),v=O[(s.v||0)%O.length],c=CI[x.c]||{},R=kqRound(kqIdx()),P=x.pk&&x.pk[v];
+ var hd=head(x);if(c.n&&hd.indexOf(esc(c.n))>=0)hd=hd.split(esc(c.n)).join('🔒 개념명은 확인 후 공개');
+ var top=hd+'<div class="card'+(P?' pk32':'')+'" style="margin-top:10px"><div class="meta">🔁 '+(R.r>=0?(R.r+1)+'회차 · ':'')+esc(x.ct[v])+(P?' · 개념 → 장면':' · 장면 → 개념')+' · 누적 '+(s.n||0)+'회'+(s.m?' · 놓친 횟수 '+s.m:'')+(x.wk?' · 약점 집중':'')+'</div><div class="retq" style="margin-top:8px">'+esc(x.qs[v])+'</div>';
+ var link=(x.link&&x.link.length?'<button class="btn l" id="klk">🔗 관련 문항 '+x.link.length+'개 이어서 풀기</button>':'');
+ var done=function(ok,t){kqRecord(x,ok);try{logAns(x.id,t||'',ok?[]:[x.n])}catch(e){}grade(x.id,ok);if(!ok&&Q.slice(qi+1).indexOf(x)<0)Q.push(x);next()};
+ var bindLink=function(ok){if($('#klk'))$('#klk').onclick=function(){kqRecord(x,ok);grade(x.id,ok);KWL=x.link.map(function(i){return II[i]}).filter(Boolean);start('kwlink')}};
+ if(P){var opts=shuf([P.a].concat(P.o));
+  app.innerHTML=top+opts.map(function(o,i){return '<button class="opt" data-i="'+i+'"><span class="no_">'+(i+1)+'</span><span>'+esc(o)+'</span></button>'}).join('')+'<div id="ex"></div></div>';
+  var pick=function(b){if($('#ex').innerHTML)return;var ok=opts[b.dataset.i]===P.a;
+   app.querySelectorAll('.opt').forEach(function(o){var w=opts[o.dataset.i];if(w===P.a){o.classList.add('ok');if(P.aw)o.insertAdjacentHTML('beforeend','<small class="why">↳ '+esc(P.aw)+'</small>')}else if(P.why&&P.why[w])o.insertAdjacentHTML('beforeend','<small class="why">↳ '+esc(P.why[w])+'</small>')});if(!ok)b.classList.add('no');
+   $('#ex').innerHTML='<div class="ans '+(ok?'':'bad')+'"><b>'+(ok?'정답!':'오답')+'</b> 개념: <b>'+esc(x.n)+'</b></div><div class="cuebox"><div class="meta">지문 단서 → 공식 키워드</div><div class="cuel">'+hlCue(x.cl[0])+' <b class="kwar">→ '+esc(x.n)+'</b></div></div>'+kqTail(x,v)+v32Back(x,0,'',true)+
+    '<button class="btn" id="kgo">다음 <kbd>Enter</kbd></button>'+link;
+   $('#kgo').onclick=function(){done(ok)};bindLink(ok);KEY=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();done(ok)}};$('#ex').scrollIntoView({behavior:'smooth',block:'nearest'})};
+  app.querySelectorAll('.opt').forEach(function(b){b.onclick=function(){pick(b)}});KEY=function(e){var n=+e.key;if(n>=1&&n<=opts.length)pick(app.querySelectorAll('.opt')[n-1])};return}
+ app.innerHTML=top+'<input id="ta" class="kqin" type="text" '+IA+' placeholder="'+(x.ask?'요소를 모두 쓰세요 (쉼표로 구분, Enter = 확인)':'공식 명칭을 쓰세요 (Enter = 확인)')+'">'+
+ '<div class="row" id="rbt"><button class="btn l" id="sh">모르겠음 · 답 보기</button><button class="btn" id="ck">확인<kbd>Enter</kbd></button></div><div id="ex"></div></div>';
+ var fin=function(typed){var t=($('#ta').value||'').trim(),auto=!!(typed&&t&&kwHits(t,x.kw).every(function(z){return z.hit}));$('#rbt').style.display='none';$('#ta').disabled=true;
+  $('#ex').innerHTML='<div class="cuebox"><div class="meta">지문 단서 → 공식 키워드</div><div class="cuel">'+hlCue(x.cl[v])+' <b class="kwar">→ '+esc(x.n)+'</b></div></div>'+kqTail(x,v)+v32Back(x,v,t,auto)+
+   (t?'<div class="meta">내 답: '+esc(t)+' '+(auto?'<span class="au">자동 감지: 공식 명칭 일치</span>':'<span style="color:var(--bad)">공식 명칭이 감지되지 않음 — 공식 명칭이 없으면 0점(표기만 다르면 맞음으로)</span>')+'</div>':'')+
+   '<div class="row"><button class="btn l" id="kno">✗ 틀림 <kbd>←</kbd></button><button class="btn" id="kok">✓ 맞음 <kbd>→</kbd></button></div>'+link;
+  $('#kok').onclick=function(){done(true,t)};$('#kno').onclick=function(){done(false,t)};bindLink(auto);
+  KEY=function(e){if(e.key==='ArrowRight'){done(true,t)}else if(e.key==='ArrowLeft'){done(false,t)}else if(e.key==='Enter'){e.preventDefault();done(auto,t)}};
+  try{document.activeElement.blur()}catch(e){}$('#ex').scrollIntoView({behavior:'smooth',block:'nearest'})};
+ $('#ta').onkeydown=function(e){if(e.key==='Enter'&&!e.isComposing){e.preventDefault();fin(true)}};
+ $('#ck').onclick=function(){fin(true)};$('#sh').onclick=function(){fin(false)}};
+/* 객관식·단답 앞면에서 개념 태그 숨김(정답 노출 방지) */
+var _head32=head;head=function(x){var h=_head32(x),c=CI[x.c];if((x.k==='mcq'||x.k==='short')&&c&&c.n){h=h.split('<span class="tag">'+esc(c.n)+'</span>').join('<span class="tag">🔒 개념명은 확인 후 공개</span>')}return h};
+/* 객관식: 그림 + 답한 뒤 하이브리드 오답·기출 근거 */
+var _showMcq32=showMcq;showMcq=function(x){_showMcq32(x);var q=app.querySelector('.card .q');if(x.img&&q)q.insertAdjacentHTML('afterend','<img class="qimg" src="'+esc(x.img)+'" alt="문항 그림" loading="lazy">');
+ if(x.kqs&&x.kqs.length){var add=function(){setTimeout(function(){var ex=$('#ex');if(!ex||!ex.innerHTML||ex.querySelector('.hy32,.gx32'))return;var h='';x.kqs.forEach(function(k){var y=II[k];if(y){if(y.hy&&y.hy.length)h+='<div class="hy32">⚠️ <b>하이브리드 오답</b>: '+y.hy.map(esc).join(' · ')+'</div>';}});
+   var y0=II[x.kqs[0]];if(y0&&y0.gx&&y0.gx.length)h+='<div class="gx32">📎 같은 키워드 기출 '+y0.gx.length+'건: '+y0.gx.slice(0,4).map(esc).join(' / ')+'</div>';
+   var a=ex.querySelector('.ans');if(a&&h)a.insertAdjacentHTML('afterend',h)},0)};
+  app.querySelectorAll('.opt').forEach(function(b){b.addEventListener('click',add)});var k0=KEY;KEY=function(e){k0&&k0(e);add()}}};
+/* 인출 지문: 요소별 동어반복 금지어 */
+var _showRet32=showRet;showRet=function(x){_showRet32(x);if(!(x.el||[]).some(function(e){return e.ban&&e.ban.length}))return;
+ var wrap=function(id,typed){var b=$(id);if(!b)return;var f=b.onclick;b.onclick=function(){var t=typed?($('#ta').value||''):'';f();
+  app.querySelectorAll('.rel').forEach(function(L,i){var e=x.el[i];if(!e||!e.ban||!e.ban.length)return;var hitKw=e.kw&&e.kw.length&&t&&kwHits(t,e.kw).every(function(z){return z.hit});
+   var hit=t?e.ban.filter(function(w){return norm(t).indexOf(norm(w))>=0}):[];
+   L.querySelector('div').insertAdjacentHTML('beforeend','<div class="ban32">🚫 금지어(이것만 쓰면 0점): '+e.ban.map(esc).join(' · ')+(hit.length&&!hitKw?'<br><b>⚠️ 내 답에 \''+hit.map(esc).join('\', \'')+'\' — 공식 명칭 없음 → 0점</b>':'')+'</div>')})}};
+ wrap('#ck',true);wrap('#sh',false)};
+/* 홈: 5일 회차 현황 */
+v29Home=function(){var K=KQS();if(!K.length)return;var S=kqS(),due=kqDue(),t=kqIdx(),X=kqExamIdx(),R=kqRound(t);
+ var inR=R.r>=0?K.filter(function(x){return (S[x.id]||{}).rd===R.r}).length:0,miss=K.filter(function(x){var s=S[x.id];return s&&s.h&&s.h.length&&!s.h[s.h.length-1][1]}).length;
+ var days='';if(R.r>=0){for(var d=0;d<R32_DAYS;d++){var ti=kqRS(R.r)+d;days+='<i class="'+(d===R.day?'on':d<R.day?'dn':'')+'">'+(d+1)+'일째<br>'+kqDate(ti)+'</i>'}}
+ var h='<div class="card kqh"><h2 style="margin:0 0 4px">🔁 핵심 키워드 5일 회차 인출</h2><div class="meta">키워드 '+K.length+'개를 <b>5일마다 한 바퀴</b>씩 돕니다(1회차 11/13–11/17 · 2회차 11/18–11/22 · 3회차 11/23–11/27). 매번 다른 방향으로 묻습니다: 장면 → 개념명 / 개념명 → 맞는 장면·틀린 설명 고르기. 놓친 키워드는 다음 날, 약점 키워드는 2일 뒤 다시 나옵니다.</div>'+
+ (R.r>=0?'<div class="rd32">'+days+'</div><div class="meta"><b>'+(R.r+1)+'회차 '+(R.day+1)+'일째</b> · 이번 회차 완료 '+inR+'/'+K.length+' · 최근 놓친 키워드 '+miss+'개 · 시험까지 '+Math.max(0,X-t)+'일</div>':'')+
+ '<div class="kqbar"><i style="width:'+Math.round(100*inR/K.length)+'%"></i></div>'+
+ '<div class="row"><button class="btn" id="goKq">🔁 오늘의 키워드 '+Math.min(due.length,70)+'개'+(due.length>70?' (남은 '+(due.length-70)+')':'')+'</button><button class="btn l" id="goKw">📚 핵심 키워드 총정리</button></div></div>';
+ var p=app.querySelector('.card.plan');p?p.insertAdjacentHTML('afterend',h):app.insertAdjacentHTML('afterbegin',h);
+ $('#goKq').onclick=function(){if(!kqDue().length){toast('오늘 꺼낼 키워드를 모두 마쳤어요 👍');return}start('kqday')};$('#goKw').onclick=kwView};
+MODES.kq=['🔁','핵심 키워드 인출','장면 → 개념명, 개념명 → 장면을 번갈아 5일 회차로'];
+
+/* v33: 하삼교 하나찍(참고) 신규 키워드 — 11/27까지 3회 이상 보장(간격 반복) */
+var _kqPool33=kqPool;kqPool=function(){var S=kqS(),t=kqIdx(),L=kqDue().slice();L.sort(function(a,b){var A=S[a.id]||{n:0,m:0,h:[]},B=S[b.id]||{n:0,m:0,h:[]};
+ var la=(A.h&&A.h.length&&!A.h[A.h.length-1][1])?1:0,lb=(B.h&&B.h.length&&!B.h[B.h.length-1][1])?1:0;
+ var na=(a.nw&&(A.n||0)<3)?1:0,nb=(b.nw&&(B.n||0)<3)?1:0;
+ return (lb-la)||((b.wk|0)-(a.wk|0))||(nb-na)||((a.sl|0)-(b.sl|0))||((b.hot|0)-(a.hot|0))||(A.n-B.n)});return L.slice(0,70)};
+var _kqRec33=kqRecord;kqRecord=function(x,ok){_kqRec33(x,ok);if(!ok||!x.nw)return;var S=kqS(),s=S[x.id],t=kqIdx(),R=kqRound(t);
+ if(s&&R.r>=0&&(s.n||0)<3){var nx=kqRS(R.r+1)+(x.sl||0);s.due=Math.min(t+2,nx);S[x.id]=s;kqSave(S)}};
+var _v29Home33=v29Home;v29Home=function(){_v29Home33();var K=KQS().filter(function(x){return x.nw});if(!K.length)return;var S=kqS(),done=K.filter(function(x){return ((S[x.id]||{}).n||0)>=3}).length;
+ var c=app.querySelector('.card.kqh');if(!c)return;var r=c.querySelector('.kqbar');var h='<div class="meta nw33" style="margin-top:6px">🆕 <b>하삼교 하나찍(참고)</b> 신규 키워드 '+K.length+'개 — 11/27까지 3회 이상 맞히기: <b>'+done+'/'+K.length+'</b> 완료 · 예측 자료라 단독 근거로 쓰지 않음</div>';
+ r?r.insertAdjacentHTML('beforebegin',h):c.insertAdjacentHTML('beforeend',h)};
 function home(){_home();v16Home();wdHome();v13Home();v29Home();v30Home()}
 
 document.addEventListener('keydown',e=>{if(e.isComposing)return;const tag=(e.target.tagName||'');if(e.key==='Escape'){home();return}

@@ -4,6 +4,9 @@ import json,sys
 import os;D=os.path.dirname(os.path.abspath(__file__))+'/';OUT=sys.argv[1] if len(sys.argv)>1 else '/workspace/quizsite/index.html'
 obj=json.load(open(D+'items.json'))
 ids=[x['id'] for x in obj['items']];assert len(ids)==len(set(ids)),'dup id'
+# v34: 지리(지교론) 장면 가드 — 지리 용어가 하나라도 있으면 빌드 실패, 제거 문항 재유입 금지
+import subprocess;g=subprocess.run([sys.executable,D+'geo_guard.py',D+'items.json'],capture_output=True,text=True);assert g.returncode==0,'GEO 용어 발견:\n'+g.stdout[-3000:]
+assert not set(ids)&set(obj.get('removed34',[])),'제거 문항 재유입'
 s=open(D+'shell.html').read();assert s.count('/*__DATA__*/')==1
 open(OUT,'w').write(s.replace('/*__DATA__*/',json.dumps(obj,ensure_ascii=False,separators=(',',':'))))
 print('items',len(ids),'->',OUT)
